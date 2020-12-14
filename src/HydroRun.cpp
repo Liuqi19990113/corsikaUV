@@ -9,6 +9,27 @@ extern "C"{
   /**run hydro from corsika*/
   void HydroRun_(int proj_id,int tar,double gamma,double mass0,double phi_x,double phi_y,double phi_z);
 }
+
+/**do Lorentz transformation from (p[0],p[1],p[2],p[3]) to (E,px,py,pz)*/
+void LorentzTransform(const double beta[4],double p[4]){
+  double beta2=beta[1]*beta[1]+beta[2]*beta[2]+beta[3]*beta[3];
+  double beta_p=beta[1]*p[1]+beta[2]*p[2]+beta[3]*p[3];
+  double C=(beta[0]-1)/beta2;
+  double E=p[0]*beta[0]-beta[0]*beta_p;
+  double px=-beta[0]*beta[1]*p[0]+p[1]+C*beta[1]*beta_p;
+  double py=-beta[0]*beta[2]*p[0]+p[2]+C*beta[2]*beta_p;
+  double pz=-beta[0]*beta[3]*p[0]+p[3]+C*beta[3]*beta_p;
+  p[0]=E,p[1]=px,p[2]=py,p[3]=pz;
+}
+
+//use python shell to get particle information
+void HydroPython(double ene,int nucleus_judge,int pro_para_1,int pro_para_2,int tar_para_1,int tar_para_2){
+  char command[200];
+  sprintf(command,"python ./run.py %g %d %d %d %d %d",ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2);
+  // cout<<command<<endl;
+  system(command);
+}
+
 void HydroRun_(int proj_id,int tar,double gamma,double mass0,double phi_z,double phi_x,double phi_y){
   //initial the particle information
   //elab per nucleon
@@ -18,7 +39,7 @@ void HydroRun_(int proj_id,int tar,double gamma,double mass0,double phi_z,double
   int nucleus_judge,pro_A,pro_Z,pro_pid,pro_iso3;
   if(proj_id>=200){
     nucleus_judge=1;
-    pro_A=proj_id%100;
+    pro_A=proj_id/100;
     pro_Z=proj_id-pro_A*100;
     ene/=pro_A;
   }
@@ -87,23 +108,6 @@ void HydroRun_(int proj_id,int tar,double gamma,double mass0,double phi_z,double
   beta[1]=beta0*phi_x,beta[2]=beta0*phi_y,beta[3]=beta0*phi_z;
 }
 
-
-/**do Lorentz transformation from (p[0],p[1],p[2],p[3]) to (E,px,py,pz)*/
-void LorentzTransform(const double beta[4],double p[4]){
-  double beta2=beta[1]*beta[1]+beta[2]*beta[2]+beta[3]*beta[3];
-  double beta_p=beta[1]*p[1]+beta[2]*p[2]+beta[3]*p[3];
-  double C=(beta[0]-1)/beta2;
-  double E=p[0]*beta[0]-beta[0]*beta_p;
-  double px=-beta[0]*beta[1]*p[0]+p[1]+C*beta[1]*beta_p;
-  double py=-beta[0]*beta[2]*p[0]+p[2]+C*beta[2]*beta_p;
-  double pz=-beta[0]*beta[3]*p[0]+p[3]+C*beta[3]*beta_p;
-  p[0]=E,p[1]=px,p[2]=py,p[3]=pz;
-}
-
-//use python shell to get particle information
-void HydroPython(double ene,int nucleus_judge,double pro_para_1,double pro_para_2,double tar_para_1,double tar_para_2){
-  system("python ./run.py");
-}
 // test code 
 // int main(){
 //   std::default_random_engine e;
@@ -117,4 +121,7 @@ void HydroPython(double ene,int nucleus_judge,double pro_para_1,double pro_para_
 //   cout<<E<<' '<<px<<' '<<py<<' '<<pz<<endl;
 //   LorentzTransform(gamma,-beta_x,-beta_y,-beta_z,E,px,py,pz);
 //   cout<<E<<' '<<px<<' '<<py<<' '<<pz<<endl;
+// }
+// int main(){
+//   HydroRun_(7,16,199,1.8456,1,0,0);
 // }

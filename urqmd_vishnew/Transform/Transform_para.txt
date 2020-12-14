@@ -6,6 +6,6 @@ x -13 13 130 // x_range: x_down x_up x_bin ,with bin is (2*val)+1
 y -13 13 130 // y_range: y_down y_up y_bin ,with bin is (2*val)+1
 eta -13 13 130 // eta_range: eta_down eta_up eta_bin ,with bin is (2*val)+1
 range 3 //range of particle impact
-input urqmd_result14 //input file name
+input urqmd_initial_14.txt //input file name
 output Initial //output file name
 K 1.6 // normalization factor of EPTensor
