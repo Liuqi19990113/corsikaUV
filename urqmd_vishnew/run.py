@@ -9,6 +9,7 @@ urqmd_path=root_path+"/urqmd"
 urqmd_initial_exec=urqmd_path+"/urqmd_initial.sh"
 urqmd_initial_result=urqmd_path+"/urqmd_result14"
 initial_path=root_path+"/Initial"
+urqmd_para=urqmd_path+"/input_initial"
 # transform variable
 transform_path=root_path+"/transform"
 transform_exec=transform_path+"/transform"
@@ -39,6 +40,32 @@ urqmd_frez_result=urqmd_path+"/frez_result"
 result_path=root_path+"/result"
 result_file=result_path+"/event"
   
+
+def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2):
+  output=open(urqmd_para,'w')
+  #it is nucleus
+  if(nucleus_judge==1):
+    output.write("pro {} {}\n".format(pro_para_1,pro_para_2))
+  else:
+    output.write("PRO {} {}\n".format(pro_para_1,pro_para_2))
+  output.write("tar {} {}\n".format(tar_para_1,tar_para_2))
+
+
+  if(tar_para_1==40):
+    output.write("IMP 0. 6.85\n")
+  elif(tar_para_1==16):
+    output.write("IMP 0. 5.73\n")
+  elif(tar_para_1==14):
+    output.write("IMP 0. 6.5.59\n")
+  else:
+    output.write("IMP 0. {}\n".format(3.2*float(tar_para_1)**(1/3)))
+  
+  output.write("ene {}\n".format(ene))
+  output.write("nev 1\n")
+  output.write("time 4 0.1\n")
+  output.write("f13\nf15\nf16\nf20\n")
+  output.write("cto 18 1")
+
 
 def run_urqmd_initial():
   os.chdir(urqmd_path)
@@ -97,3 +124,4 @@ pro_para_1=int(sys.argv[3])
 pro_para_2=int(sys.argv[4])
 tar_para_1=int(sys.argv[5])
 tar_para_2=int(sys.argv[6])
+write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
