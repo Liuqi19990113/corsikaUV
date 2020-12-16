@@ -19,6 +19,11 @@ C-----------------------------------------------------------------------
 #include "corsika.h"
       double precision mass0
       integer NPROT,NNEUT
+      integer mmry,mxptl
+      parameter (mmry=1)
+      integer nptl,idptl
+      real pptl,tivptl,xorptl
+      common/Hydro/nptl,pptl(5,mxptl),idptl(mxptl)
 
 c     judge if the particle is the particle hydro support  
       if(.not.(itype >= 200 .or. (itype>=7 .and. itype<=9) .or. 
@@ -33,7 +38,7 @@ c     judge if the particle is the particle hydro support
         mass0 = PAMA(14)*NPROT + PAMA(13)*NNEUT
       endif
       CALL HydroRun(itype,tar,curpar(1),mass0,curpar(2),
-     & curpar(3),curpar(4))
+     & curpar(3),curpar(4),nptl,idptl,pptl)
 
       RETURN
       END

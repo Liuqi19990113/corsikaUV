@@ -7,14 +7,16 @@ root_path=sys.path[0]
 # urqmd initial variable
 urqmd_path=root_path+"/urqmd"
 urqmd_initial_exec=urqmd_path+"/urqmd_initial.sh"
-urqmd_initial_result=urqmd_path+"/urqmd_result14"
+urqmd_initial_result14=urqmd_path+"/urqmd_initial_14.txt"
+urqmd_initial_result19=urqmd_path+"/urqmd_initial_19.txt"
 initial_path=root_path+"/Initial"
 urqmd_para=urqmd_path+"/input_initial"
+QGP_judge_exec=urqmd_path+"/QGP_judge"
 # transform variable
 transform_path=root_path+"/transform"
 transform_exec=transform_path+"/transform"
 transform_para=transform_path+"/Transform_para.txt"
-transform_input=transform_path+"/urqmd_result14"
+transform_input=transform_path+"/urqmd_initial_14.txt"
 transform_result_dir=transform_path+"/Initial"
 # VISHNew variable
 vishnew_path=root_path+"/VISHNew"
@@ -70,9 +72,19 @@ def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para
 def run_urqmd_initial():
   os.chdir(urqmd_path)
   os.popen(urqmd_initial_exec)
+  QGP_judge=int(os.popen(QGP_judge_exec).read())
   if(os.path.exists(transform_input)):
     os.remove(transform_input)
-  shutil.move(urqmd_initial_result,transform_input)
+  if(QGP_judge==-1):
+    run_urqmd_initial()
+    return
+  elif(QGP_judge==1):
+    shutil.move(urqmd_initial_result14,transform_input)
+    return QGP_judge
+  elif(QGP_judge==0):
+    shutil.move(urqmd_initial_result19,osc2u_input)
+    return QGP_judge
+
 
 
 def run_transform():
@@ -125,3 +137,10 @@ pro_para_2=int(sys.argv[4])
 tar_para_1=int(sys.argv[5])
 tar_para_2=int(sys.argv[6])
 write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
+
+QGP_judge=run_urqmd_initial()
+if(QGP_judge==1):
+  run_transform()
+  run_vishnew()
+run_osc2u()
+run_urqmd_frez()

@@ -7,11 +7,11 @@
 using namespace std;
 extern "C"{
   /**run hydro from corsika*/
-  void HydroRun_(int proj_id,int tar,double gamma,double mass0,double phi_x,double phi_y,double phi_z);
+  void HydroRun_(int proj_id,int tar,double gamma,double mass0,double phi_x,double phi_y,double phi_z,int nptl,int idptl[],double pptl[][5]);
 }
 
 /**do Lorentz transformation from (p[0],p[1],p[2],p[3]) to (E,px,py,pz)*/
-void LorentzTransform(const double beta[4],double p[4]){
+void LorentzTransform(const double beta[4],double p[4],int nptl,int idptl[],double pptl[][5]){
   double beta2=beta[1]*beta[1]+beta[2]*beta[2]+beta[3]*beta[3];
   double beta_p=beta[1]*p[1]+beta[2]*p[2]+beta[3]*p[3];
   double C=(beta[0]-1)/beta2;
@@ -108,20 +108,7 @@ void HydroRun_(int proj_id,int tar,double gamma,double mass0,double phi_z,double
   beta[1]=beta0*phi_x,beta[2]=beta0*phi_y,beta[3]=beta0*phi_z;
 }
 
-// test code 
-// int main(){
-//   std::default_random_engine e;
-//   e.seed(int(time(0)));
-//   std::uniform_real_distribution<double>rndgen(-1./3,1./3);
-//   double beta_x=rndgen(e),beta_y=rndgen(e),beta_z=rndgen(e);
-//   double gamma=1/sqrt(1-(beta_x*beta_x+beta_y*beta_y+beta_z*beta_z));
-//   double E=10,px=E*beta_x,py=E*beta_y,pz=E*beta_z;
-//   cout<<E<<' '<<px<<' '<<py<<' '<<pz<<endl;
-//   LorentzTransform(gamma,beta_x,beta_y,beta_z,E,px,py,pz);
-//   cout<<E<<' '<<px<<' '<<py<<' '<<pz<<endl;
-//   LorentzTransform(gamma,-beta_x,-beta_y,-beta_z,E,px,py,pz);
-//   cout<<E<<' '<<px<<' '<<py<<' '<<pz<<endl;
-// }
-// int main(){
-//   HydroRun_(7,16,199,1.8456,1,0,0);
-// }
+
+void ReadHydro(double beta[4],int nptl,int idptl[],double pptl[][5]){
+  const string input_file="./urqmd_vishnew/urqmd/urqmd_frez_19.txt";
+}
