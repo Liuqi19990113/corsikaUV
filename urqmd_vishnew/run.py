@@ -35,6 +35,7 @@ osc2u_input=osc2u_path+"/OSCAR.DAT"
 osc2u_result=osc2u_path+"/fort.14"
 osc2u_result_move=osc2u_path+"/frez_start"
 #urqmd frezout
+urqmd_spec=urqmd_path+"/urqmd_spec_19.txt"
 urqmd_frez_input=urqmd_path+"/frez_start"
 urqmd_frez_exec=urqmd_path+"/urqmd_frez.sh"
 urqmd_frez_result=urqmd_path+"/frez_result"
@@ -75,11 +76,14 @@ def run_urqmd_initial():
   QGP_judge=int(os.popen(QGP_judge_exec).read())
   if(os.path.exists(transform_input)):
     os.remove(transform_input)
+  if(os.path.exists(urqmd_spec)):
+    os.remove(urqmd_spec)
   if(QGP_judge==-1):
     run_urqmd_initial()
     return
   elif(QGP_judge==1):
     shutil.move(urqmd_initial_result14,transform_input)
+    shutil.move(urqmd_initial_result19,urqmd_spec)
     return QGP_judge
   elif(QGP_judge==0):
     shutil.move(urqmd_initial_result19,osc2u_input)

@@ -1,11 +1,8 @@
       SUBROUTINE HydroStore( ELABN )
 
 C-----------------------------------------------------------------------
-#if __EPOS__
-C  EPOS PARTICLES STORE (INTO CORSIKA STACK)
-#endif
 C
-C  STORES EPOS/NEXUS OUTPUT PARTICLES INTO CORSIKA STACK.
+C  STORES hydro OUTPUT PARTICLES INTO CORSIKA STACK.
 C  THIS SUBROUTINE IS CALLED FROM NEXLNK.
 C  ARGUMENT:
 C   ELABN  = ENERGY/NUCLEON OF PROJECTILE (GEV)
@@ -36,35 +33,20 @@ C-----------------------------------------------------------------------
 #endif
 #include "corsika.h"
 
+      integer NPROT,NNEUT,maproj,KODCRD
       integer mmry,mxptl
-      parameter (mmry=1)   !memory saving factor
-#if __EPOS__
-C--------------------------- EPOS COMMON ------------------------------
-      integer nevt,kolevt,npjevt,minfra,maxfra,nglevt,koievt,kohevt
-     *,ntgevt,npnevt,nppevt,ntnevt,ntpevt,jpnevt,jppevt,jtnevt,jtpevt
-      real phievt,bimevt,pmxevt,egyevt,xbjevt,qsqevt,zppevt,zptevt
-      common/cevt/phievt,nevt,bimevt,kolevt,koievt,pmxevt,egyevt,npjevt
-     *,ntgevt,npnevt,nppevt,ntnevt,ntpevt,jpnevt,jppevt,jtnevt,jtpevt
-     *,xbjevt,qsqevt,nglevt,zppevt,zptevt,minfra,maxfra,kohevt
-      parameter (mxptl=200000/mmry) !max nr of particles in nexus particle list
-      integer      infragm,ibreit
-      common/nucl6/infragm,ibreit
-#endif
-      integer nptl,iorptl,idptl,ifrptl,jorptl,istptl,ibptl,ityptl
+      parameter (mmry=1)
+      parameter (mxptl=200000/mmry)
+      integer nptl,nspec,idptl
       real pptl,tivptl,xorptl
-      common/cptl/nptl,pptl(5,mxptl),iorptl(mxptl),idptl(mxptl)
-     *,istptl(mxptl),tivptl(2,mxptl),ifrptl(2,mxptl),jorptl(mxptl)
-     *,xorptl(4,mxptl),ibptl(4,mxptl),ityptl(mxptl)
-      integer laproj,maproj,latarg,matarg
-      real core,fctrmx
-      common/nucl1/laproj,maproj,latarg,matarg,core,fctrmx
+      common/Hydro/NPROT,NNEUT,nptl,nspec,pptl(5,mxptl),idptl(mxptl)
 C-----------------------------------------------------------------------
       DOUBLE PRECISION EA,ELABN,ELASTI,EMAX,COSTET,PL2,PT2,PTM
 CC    DOUBLE PRECISION GAMMAX
       DOUBLE PRECISION PFRX(60),PFRY(60),PTOT,CPHIV,SPHIV
       DOUBLE PRECISION FAC1,FAC2
       REAL             ETOT,GNU
-      INTEGER          ITYP(60),NREST,IREST,NNEW,INEW,NZNEW,NNNEW,I,
+      INTEGER          ITYP(60),IREST,INEW,NZNEW,NNNEW,I,
      *                 KODNEX,KODCRS,JFIN,KNEW,J,MEL,MEN,LL
 #if __EHISTORY__
       INTEGER          IK
@@ -87,22 +69,17 @@ c  definition of the COAST crs::CInteraction class
 #endif
 C-----------------------------------------------------------------------
 
-      IF ( DEBUG ) WRITE(MDEBUG,*) 'NSTORE:'
+      IF ( DEBUG ) WRITE(MDEBUG,*) 'HydroStore:'
 
 C  NUMBER OF SPECTATORS OF REMAINING NUCLEUS IS NREST
-      NREST = ITYPE/100 - npjevt
       IREST = ITYPE
-#if __INTTEST__
-      IWOUNP = npjevt
-      IWOUNT = ntgevt
-#endif
-      NNEW   = 0
       INEW   = 0
       ETOT   = 0.
       ELASTI = 0.
       NZNEW  = 0
       NNNEW  = 0
       KNEW   = 0
+      maproj=NPROT+NNEUT
 
 c  event variables:
 c     nrevt.......... event number
@@ -115,7 +92,7 @@ c     egyevt ........ pp cm energy (hadron) or string energy (lepton)
 c     npjevt ........ number of primary projectile participants
 c     ntgevt ........ number of primary target participants
 
-      GNU  = kolevt
+      GNU  = 1
       EMAX = 0.D0
 CC    GAMMAX = 0.D0
 #if __EHISTORY__
@@ -134,8 +111,6 @@ C  STORE MASS PENETRATION BEFORE INTERACTION
 
 C  PARTICLE LOOP
       DO  5  I = 1, nptl
-C  SKIP PARTICLES NOT FROM LAST GENERATION (ISTPTL=0)
-        IF ( istptl(I) .GT. 0 ) GOTO 5
 
 c  particle variables:
 c     i ............. particle number
@@ -145,21 +120,6 @@ c     pptl(2,i) ..... y-component of particle momentum
 c     pptl(3,i) ..... z-component of particle momentum
 c     pptl(4,i) ..... particle energy
 c     pptl(5,i) ..... particle mass
-c     iorptl(i) ..... particle number of father
-c     jorptl(i) ..... particle number of mother
-c     ifrptl(1,i) ... particle number of first child
-c     ifrptl(2,i) ... particle number of last child
-c     istptl(i) ..... generation flag: last gen.(0) or not(1) or ghost(2)
-c     xorptl(1,i) ... x-component of formation point
-c     xorptl(2,i) ... y-component of formation point
-c     xorptl(3,i) ... z-component of formation point
-c     xorptl(4,i) ... formation time
-c     tivptl(1,i) ... formation time (always in the pp-cms!)
-c     tivptl(2,i) ... destruction time (always in the pp-cms!)
-c     ityptl(i)  .....from target (10-19), soft (20-29), hard (30-39),
-c                     projectile (40-49) string, droplet (50)
-c     idiptl(i) ..... id of father (999 if no father)
-c     idjptl(i) ..... id of mother (999 if no mother)
 
 #if !__INTTEST__
 C  ELIMINATE TARGET SPECTATORS
@@ -171,303 +131,378 @@ C  ELIMINATE BACKWARD GOING PARTICLES
 C  CONVERT PARTICLE CODE  NEX(US) ---> C(O)RS(IKA)
 C  MOST FREQUENT PARTICLES COME FIRST
         KODNEX = idptl(I)
-C  NUCLEUS
-        IF     ( KODNEX .GT. 10000 ) THEN
-          KODCRS = MOD(KODNEX,10000)*10 + MOD(KODNEX/10000,1000)
-        ELSEIF ( KODNEX .EQ.   17  ) THEN
-          KODCRS = 201
-        ELSEIF ( KODNEX .EQ.   18  ) THEN
-          KODCRS = 301
-        ELSEIF ( KODNEX .EQ.   19  ) THEN
-          KODCRS = 402
+
+        IF ( ABS(KODNEX).GT.100 .AND. ABS(KODNEX).LT.340 ) THEN
+C  MESONS, ALSO WITH STRANGENESS
 C  MESONS
-        ELSEIF     ( KODNEX .EQ.   110 ) THEN
-          KODCRS = 7
-        ELSEIF ( KODNEX .EQ.   120 ) THEN
-          KODCRS = 8
-        ELSEIF ( KODNEX .EQ.  -120 ) THEN
-          KODCRS = 9
-        ELSEIF ( KODNEX .EQ.   220 ) THEN
-          KODCRS = 17
-C  NUCLEONS
-        ELSEIF ( KODNEX .EQ.  1220 ) THEN
-          KODCRS = 13
-        ELSEIF ( KODNEX .EQ.  1120 ) THEN
-          KODCRS = 14
-        ELSEIF ( KODNEX .EQ. -1120 ) THEN
-          KODCRS = 15
-        ELSEIF ( KODNEX .EQ. -1220 ) THEN
-          KODCRS = 25
+          IF     ( KODNEX .EQ.   111 ) THEN    ! PI(0)
+            KODCRS =  7
+          ELSEIF ( KODNEX .EQ.   211 ) THEN    ! PI(+)
+            KODCRS =  8
+          ELSEIF ( KODNEX .EQ.  -211 ) THEN    ! PI(-)
+            KODCRS =  9
+          ELSEIF ( KODNEX .EQ.   221 ) THEN    ! ETA
+            KODCRS = 17
 C  STRANGE MESONS
-        ELSEIF ( KODNEX .EQ.   -20 .or. KODNEX .EQ.   230 ) THEN
-          KODCRS = 10
-        ELSEIF ( KODNEX .EQ.   130 ) THEN
-          KODCRS = 11
-        ELSEIF ( KODNEX .EQ.  -130 ) THEN
-          KODCRS = 12
-        ELSEIF ( KODNEX .EQ.    20 .or. KODNEX .EQ.   -230 ) THEN
-          KODCRS = 16
+          ELSEIF ( KODNEX .EQ.   130 ) THEN    ! K0L
+            KODCRS = 10
+          ELSEIF ( KODNEX .EQ.   321 ) THEN    ! K(+)
+            KODCRS = 11
+          ELSEIF ( KODNEX .EQ.  -321 ) THEN    ! K(-)
+            KODCRS = 12
+          ELSEIF ( KODNEX .EQ.   310 ) THEN    ! K0S
+            KODCRS = 16
+          ELSEIF ( KODNEX .EQ.   311  .OR.     ! K(0)
+     *             KODNEX .EQ.  -311 ) THEN    ! ANTI-K(0)
+            CALL RMMARD( RD,1,1 )
+            IF ( RD(1) .GE. 0.5D0 ) THEN
+              KODCRS = 10                        ! K0L
+            ELSE
+              KODCRS = 16                        ! K0S
+            ENDIF
+          ENDIF
+
+        ELSEIF ( ABS(KODNEX).GT.1000 .AND. ABS(KODNEX).LT.3400 )THEN
+C  BARYONS, ALSO WITH STRANGENESS
+C  NUCLEAONS
+          IF     ( KODNEX .EQ.  2112 ) THEN    ! N
+            KODCRS = 13
+          ELSEIF ( KODNEX .EQ.  2212 ) THEN    ! P
+            KODCRS = 14
+          ELSEIF ( KODNEX .EQ. -2212 ) THEN    ! ANTI-P
+            KODCRS = 15
+          ELSEIF ( KODNEX .EQ. -2112 ) THEN    ! ANTI-N
+            KODCRS = 25
 C  STRANGE BARYONS
-        ELSEIF ( KODNEX .EQ.  2130 ) THEN
-          KODCRS = 18
-        ELSEIF ( KODNEX .EQ.  1130 ) THEN
-          KODCRS = 19
-        ELSEIF ( KODNEX .EQ.  1230 ) THEN
-          KODCRS = 20
-        ELSEIF ( KODNEX .EQ.  2230 ) THEN
-          KODCRS = 21
-        ELSEIF ( KODNEX .EQ.  1330 ) THEN
-          KODCRS = 22
-        ELSEIF ( KODNEX .EQ.  2330 ) THEN
-          KODCRS = 23
-        ELSEIF ( KODNEX .EQ.  3331 ) THEN
-          KODCRS = 24
-        ELSEIF ( KODNEX .EQ. -2130 ) THEN
-          KODCRS = 26
-        ELSEIF ( KODNEX .EQ. -1130 ) THEN
-          KODCRS = 27
-        ELSEIF ( KODNEX .EQ. -1230 ) THEN
-          KODCRS = 28
-        ELSEIF ( KODNEX .EQ. -2230 ) THEN
-          KODCRS = 29
-        ELSEIF ( KODNEX .EQ. -1330 ) THEN
-          KODCRS = 30
-        ELSEIF ( KODNEX .EQ. -2330 ) THEN
-          KODCRS = 31
-        ELSEIF ( KODNEX .EQ. -3331 ) THEN
-          KODCRS = 32
+          ELSEIF ( KODNEX .EQ.  3122 ) THEN    ! LAMBDA
+            KODCRS = 18
+          ELSEIF ( KODNEX .EQ.  3222 ) THEN    ! SIGMA(+)
+            KODCRS = 19
+          ELSEIF ( KODNEX .EQ.  3212 ) THEN    ! SIGMA(0)
+            KODCRS = 20
+          ELSEIF ( KODNEX .EQ.  3112 ) THEN    ! SIGMA(-)
+            KODCRS = 21
+          ELSEIF ( KODNEX .EQ.  3322 ) THEN    ! XI(0)
+            KODCRS = 22
+          ELSEIF ( KODNEX .EQ.  3312 ) THEN    ! XI(-)
+            KODCRS = 23
+          ELSEIF ( KODNEX .EQ.  3334 ) THEN    ! OMEGA(-)
+            KODCRS = 24
+          ELSEIF ( KODNEX .EQ. -3122 ) THEN    ! ANTI_LAMBDA
+            KODCRS = 26
+          ELSEIF ( KODNEX .EQ. -3222 ) THEN    ! ANTI-SIGMA(-)
+            KODCRS = 27
+          ELSEIF ( KODNEX .EQ. -3212 ) THEN    ! ANTI-SIGMA(0)
+            KODCRS = 28
+          ELSEIF ( KODNEX .EQ. -3112 ) THEN    ! ANTI-SIGMA(+)
+            KODCRS = 29
+          ELSEIF ( KODNEX .EQ. -3322 ) THEN    ! ANTI-XI(0)
+            KODCRS = 30
+          ELSEIF ( KODNEX .EQ. -3312 ) THEN    ! ANTI-XI(+)
+            KODCRS = 31
+          ELSEIF ( KODNEX .EQ. -3334 ) THEN    ! ANTI-OMEGA(+)
+            KODCRS = 32
+          ENDIF
+
+        ELSEIF ( ABS(KODNEX) .LE. 22 )THEN
+C  GAMMAS, LEPTONS AND NEUTRINOS
+          IF     ( KODNEX .EQ.    22 ) THEN    ! GAMMA
+            KODCRS =  1
 C  LEPTONS
-        ELSEIF ( KODNEX .EQ.    10 ) THEN
-          KODCRS = 1
-        ELSEIF ( KODNEX .EQ.   -12 ) THEN
-          KODCRS = 2
-        ELSEIF ( KODNEX .EQ.    12 ) THEN
-          KODCRS = 3
-        ELSEIF ( KODNEX .EQ.   -14 ) THEN
-          KODCRS = 5
-        ELSEIF ( KODNEX .EQ.    14 ) THEN
-          KODCRS = 6
+          ELSEIF ( KODNEX .EQ.   -11 ) THEN    ! E(+)
+            KODCRS =  2
+          ELSEIF ( KODNEX .EQ.    11 ) THEN    ! E(-)
+            KODCRS =  3
+          ELSEIF ( KODNEX .EQ.   -13 ) THEN    ! MU(+)
+            KODCRS =  5
+          ELSEIF ( KODNEX .EQ.    13 ) THEN    ! MU(-)
+            KODCRS =  6
 #if __CHARM__ || __TAULEP__
 C  TAU LEPTONS
-        ELSEIF ( KODNEX .EQ.   -16 ) THEN
-          KODCRS = 131                     ! TAU(+)
-        ELSEIF ( KODNEX .EQ.    16 ) THEN
-          KODCRS = 132                     ! TAU(-)
+          ELSEIF ( KODNEX .EQ.   -15 ) THEN    ! TAU(+)
+            KODCRS = 131
+          ELSEIF ( KODNEX .EQ.    15 ) THEN    ! TAU(-)
+            KODCRS = 132
 #else
-C  CANNOT TREAT TAU LEPTONS, CONVERT TO MUONS
-        ELSEIF ( KODNEX .EQ.   -16 ) THEN  ! TAU(+)
-          KODCRS = 5
-        ELSEIF ( KODNEX .EQ.    16 ) THEN  ! TAU(-
-          KODCRS = 6
-#endif
-#if __CHARM__
-C  CHARMED MESONS
-        ELSEIF ( KODNEX .EQ.  -140 ) THEN  ! D(0)
-          KODCRS = 116
-        ELSEIF ( KODNEX .EQ.  -240 ) THEN  ! D(+)
-          KODCRS = 117
-        ELSEIF ( KODNEX .EQ.   240 ) THEN  ! A-D(-)
-          KODCRS = 118
-        ELSEIF ( KODNEX .EQ.   140 ) THEN  ! A-D(0)
-          KODCRS = 119
-        ELSEIF ( KODNEX .EQ.  -340 ) THEN  ! D_S(+)
-          KODCRS = 120
-        ELSEIF ( KODNEX .EQ.   340 ) THEN  ! A-D_S(-)
-          KODCRS = 121
-        ELSEIF ( KODNEX .EQ.   440 ) THEN  ! ETA_C
-          KODCRS = 122
-        ELSEIF ( KODNEX .EQ.  -141 ) THEN  ! D*(0)
-          KODCRS = 123
-        ELSEIF ( KODNEX .EQ.  -241 ) THEN  ! D*(+)
-          KODCRS = 124
-        ELSEIF ( KODNEX .EQ.   241 ) THEN  ! A-D*(-)
-          KODCRS = 125
-        ELSEIF ( KODNEX .EQ.   141 ) THEN  ! A-D*(0)
-          KODCRS = 126
-        ELSEIF ( KODNEX .EQ.  -341 ) THEN  ! D_S*(+)
-          KODCRS = 127
-        ELSEIF ( KODNEX .EQ.   341 ) THEN  ! A-D_S*(-)
-          KODCRS = 128
-        ELSEIF ( KODNEX .EQ.   441 ) THEN  ! J/PSI
-          KODCRS = 130
-C  CHARMED BARYONS
-        ELSEIF ( KODNEX .EQ.  2140 ) THEN  ! LAMBDA_C(+)
-          KODCRS = 137
-        ELSEIF ( KODNEX .EQ.  3140 ) THEN  ! XI_C(+)
-          KODCRS = 138
-        ELSEIF ( KODNEX .EQ.  3240 ) THEN  ! XI_C(0)
-          KODCRS = 139
-        ELSEIF ( KODNEX .EQ.  1140 ) THEN  ! SIGMA_C(++)
-          KODCRS = 140
-        ELSEIF ( KODNEX .EQ.  1240 ) THEN  ! SIGMA_C(+)
-          KODCRS = 141
-        ELSEIF ( KODNEX .EQ.  2240 ) THEN  ! SIGMA_C(0)
-          KODCRS = 142
-        ELSEIF ( KODNEX .EQ.  1340 ) THEN  ! XI_C''(+)
-          KODCRS = 143
-        ELSEIF ( KODNEX .EQ.  2340 ) THEN  ! XI_C''(0)
-          KODCRS = 144
-        ELSEIF ( KODNEX .EQ.  3340 ) THEN  ! OMEGA_C(0)
-          KODCRS = 145
-        ELSEIF ( KODNEX .EQ. -2140 ) THEN  ! A-LAMBDA_C(-)
-          KODCRS = 149
-        ELSEIF ( KODNEX .EQ. -3140 ) THEN  ! A-XI_C(-)
-          KODCRS = 150
-        ELSEIF ( KODNEX .EQ. -3240 ) THEN  ! A-XI_C(0)
-          KODCRS = 151
-        ELSEIF ( KODNEX .EQ. -1140 ) THEN  ! A-SIGMA_C(--)
-          KODCRS = 152
-        ELSEIF ( KODNEX .EQ. -1240 ) THEN  ! A-SIGMA_C(-)
-          KODCRS = 153
-        ELSEIF ( KODNEX .EQ. -2240 ) THEN  ! A-SIGMA_C(0)
-          KODCRS = 154
-        ELSEIF ( KODNEX .EQ. -1340 ) THEN  ! A-XI_C''(-)
-          KODCRS = 155
-        ELSEIF ( KODNEX .EQ. -2340 ) THEN  ! A-XI_C''(0)
-          KODCRS = 156
-        ELSEIF ( KODNEX .EQ. -3340 ) THEN  ! A-OMEGA_C(0)
-          KODCRS = 157
-        ELSEIF ( KODNEX .EQ.  1141 ) THEN  ! SIGMA_C*(++)
-          KODCRS = 161
-        ELSEIF ( KODNEX .EQ.  1241 ) THEN  ! SIGMA_C*(+)
-          KODCRS = 162
-        ELSEIF ( KODNEX .EQ.  2241 ) THEN  ! SIGMA_C*(0)
-          KODCRS = 163
-        ELSEIF ( KODNEX .EQ. -1141 ) THEN  ! A-SIGMA_C*(--)
-          KODCRS = 171
-        ELSEIF ( KODNEX .EQ. -1241 ) THEN  ! A-SIGMA_C*(-)
-          KODCRS = 172
-        ELSEIF ( KODNEX .EQ. -2241 ) THEN  ! A-SIGMA_C*(0)
-          KODCRS = 173
-#else
-C  CHARMED MESONS CANNOT BE TREATED, TAKE INSTEAD STRANGE MESONS
-        ELSEIF ( KODNEX .EQ.  -140 ) THEN  ! D(0)
-          KODCRS = 12
-        ELSEIF ( KODNEX .EQ.  -240  .OR.   ! D(+)
-     *           KODNEX .EQ.   240 ) THEN  ! A-D(-)
-          CALL RMMARD( RD,1,1 )
-          IF ( RD(1) .GE. 0.5D0 ) THEN
-            KODCRS = 10
-          ELSE
-            KODCRS = 16
-          ENDIF
-        ELSEIF ( KODNEX .EQ.   140 ) THEN  ! A-D(0)
-          KODCRS = 11
-        ELSEIF ( KODNEX .EQ.  -340  .OR.   ! D_S(+)
-     *           KODNEX .EQ.   340 ) THEN  ! A-D_S(-)
-          IF ( RD(1) .GE. 0.5D0 ) THEN
-            KODCRS = 10
-          ELSE
-            KODCRS = 16
-          ENDIF
-        ELSEIF ( KODNEX .EQ.   440 ) THEN  ! ETA_C
-          KODCRS = 17
-        ELSEIF ( KODNEX .EQ.  -141 ) THEN  ! D*(0)
-          KODCRS = 12
-        ELSEIF ( KODNEX .EQ.  -241  .OR.   ! D*(+)
-     *           KODNEX .EQ.   241  .OR.   ! A-D*(-)
-     *           KODNEX .EQ.  -341  .OR.   ! D_S*(+)
-     *           KODNEX .EQ.   341 ) THEN  ! A-D_S*(-)
-          IF ( RD(1) .GE. 0.5D0 ) THEN
-            KODCRS = 10
-          ELSE
-            KODCRS = 16
-          ENDIF
-        ELSEIF ( KODNEX .EQ.   141 ) THEN  ! A-D*(0)
-          KODCRS = 11
-        ELSEIF ( KODNEX .EQ.   441 ) THEN  ! J/PSI
-          KODCRS = 17
-C  CHARMED BARYONS CANNOT BE TREATED, TAKE INSTEAD STRANGE BARYON
-        ELSEIF ( KODNEX .EQ.  2140 ) THEN  ! LAMBDA_C(+)
-          KODCRS = 18
-        ELSEIF ( KODNEX .EQ.  3140 ) THEN  ! XI_C(+)
-          KODCRS = 22
-        ELSEIF ( KODNEX .EQ.  3240 ) THEN  ! XI_C(0)
-          KODCRS = 23
-        ELSEIF ( KODNEX .EQ.  1140 ) THEN  ! SIGMA_C(++)
-          KODCRS = 19
-        ELSEIF ( KODNEX .EQ.  1240 ) THEN  ! SIGMA_C(+)
-          KODCRS = 20
-        ELSEIF ( KODNEX .EQ.  2240 ) THEN  ! SIGMA_C(0)
-          KODCRS = 21
-        ELSEIF ( KODNEX .EQ.  1340 ) THEN  ! XI_C''(+)
-          KODCRS = 23
-        ELSEIF ( KODNEX .EQ.  2340 ) THEN  ! XI_C''(0)
-          KODCRS = 22
-        ELSEIF ( KODNEX .EQ.  3340 ) THEN  ! OMEGA_C(0)
-          KODCRS = 24
-        ELSEIF ( KODNEX .EQ. -2140 ) THEN  ! A-LAMBDA_C(-)
-          KODCRS = 26
-        ELSEIF ( KODNEX .EQ. -3140 ) THEN  ! A-XI_C(-)
-          KODCRS = 30
-        ELSEIF ( KODNEX .EQ. -3240 ) THEN  ! A-XI_C(0)
-          KODCRS = 31
-        ELSEIF ( KODNEX .EQ. -1140 ) THEN  ! A-SIGMA_C(--)
-          KODCRS = 27
-        ELSEIF ( KODNEX .EQ. -1240 ) THEN  ! A-SIGMA_C(-)
-          KODCRS = 28
-        ELSEIF ( KODNEX .EQ. -2240 ) THEN  ! A-SIGMA_C(0)
-          KODCRS = 29
-        ELSEIF ( KODNEX .EQ. -1340 ) THEN  ! A-XI_C''(-)
-          KODCRS = 31
-        ELSEIF ( KODNEX .EQ. -2340 ) THEN  ! A-XI_C''(0)
-          KODCRS = 30
-        ELSEIF ( KODNEX .EQ. -3340 ) THEN  ! A-OMEGA_C(0)
-          KODCRS = 32
-        ELSEIF ( KODNEX .EQ.  1141 ) THEN  ! SIGMA_C*(++)
-          KODCRS = 161
-        ELSEIF ( KODNEX .EQ.  1241 ) THEN  ! SIGMA_C*(+)
-          KODCRS = 162
-        ELSEIF ( KODNEX .EQ.  2241 ) THEN  ! SIGMA_C*(0)
-          KODCRS = 163
-        ELSEIF ( KODNEX .EQ. -1141 ) THEN  ! A-SIGMA_C*(--)
-          KODCRS = 171
-        ELSEIF ( KODNEX .EQ. -1241 ) THEN  ! A-SIGMA_C*(-)
-          KODCRS = 172
-        ELSEIF ( KODNEX .EQ. -2241 ) THEN  ! A-SIGMA_C*(0)
-          KODCRS = 173
+C  TAU LEPTONS CANNOT BE TREATED, TAKE INSTEAD MUONS
+          ELSEIF ( KODNEX .EQ.   -15 ) THEN    ! TAU(+)
+            KODCRS = 5                           ! BECOMES MU(+)
+          ELSEIF ( KODNEX .EQ.    15 ) THEN    ! TAU(-)
+            KODCRS = 6                           ! BECOMES MU(-)
 #endif
 #if __NEUTRINO__
-        ELSEIF ( KODNEX .EQ.    11 ) THEN
-          KODCRS = 66
-        ELSEIF ( KODNEX .EQ.   -11 ) THEN
-          KODCRS = 67
-        ELSEIF ( KODNEX .EQ.    13 ) THEN
-          KODCRS = 68
-        ELSEIF ( KODNEX .EQ.   -13 ) THEN
-          KODCRS = 69
+C  NEUTRINOS
+          ELSEIF ( KODNEX .EQ.    12 ) THEN    ! NU_E
+            KODCRS = 66
+          ELSEIF ( KODNEX .EQ.   -12 ) THEN    ! ANTI-NU_E
+            KODCRS = 67
+          ELSEIF ( KODNEX .EQ.    14 ) THEN    ! NU_MU
+            KODCRS = 68
+          ELSEIF ( KODNEX .EQ.   -14 ) THEN    ! ANTI-NU_MU
+            KODCRS = 69
+C  TAU NEUTRINOS
 #if __CHARM__ || __TAULEP__
-C  TAU NEUTRINO CANNOT BE TREATED, TAKE INSTEAD MUONIC NEUTRINO
-        ELSEIF ( KODNEX .EQ.    15 ) THEN  ! NU_TAU
-          KODCRS = 133
-        ELSEIF ( KODNEX .EQ.   -15 ) THEN  ! A-NU_TAU
-          KODCRS = 134
+          ELSEIF ( KODNEX .EQ.    16 ) THEN    ! NU_TAU
+            KODCRS = 133
+          ELSEIF ( KODNEX .EQ.   -16 ) THEN    ! ANTI-NU_TAU
+            KODCRS = 134
 #else
-C  CANNOT TREAT TAU NEUTRINO, TAKE INSTEAD MUONIC NEUTRINO
-        ELSEIF ( KODNEX .EQ.    15 ) THEN  ! NU_TAU
-          KODCRS = 68
-        ELSEIF ( KODNEX .EQ.   -15 ) THEN  ! A-NU_TAU
-          KODCRS = 69
+          ELSEIF ( KODNEX .EQ.    16 ) THEN    ! NU_TAU
+            KODCRS = 68                          ! BECOMES NU_MU
+          ELSEIF ( KODNEX .EQ.   -16 ) THEN    ! ANTI-NU_TAU
+            KODCRS = 69                          ! BECOMES ANTI-NU_MU
 #endif
 #else
 C  NEUTRINOS ARE SKIPPED
-        ELSEIF ( KODNEX .EQ.    11 ) THEN
-          GOTO 55
-        ELSEIF ( KODNEX .EQ.   -11 ) THEN
-          GOTO 55
-        ELSEIF ( KODNEX .EQ.    13 ) THEN
-          GOTO 55
-        ELSEIF ( KODNEX .EQ.   -13 ) THEN
-          GOTO 55
-        ELSEIF ( KODNEX .EQ.    15 ) THEN
-          GOTO 55
-        ELSEIF ( KODNEX .EQ.   -15 ) THEN
-          GOTO 55
+          ELSEIF ( KODNEX .EQ.    12 ) THEN    ! NU_E
+            GOTO 55
+          ELSEIF ( KODNEX .EQ.   -12 ) THEN    ! ANTI-NU_E
+            GOTO 55
+          ELSEIF ( KODNEX .EQ.    14 ) THEN    ! NU_MU
+            GOTO 55
+          ELSEIF ( KODNEX .EQ.   -14 ) THEN    ! ANTI-NU_MU
+            GOTO 55
+C  TAU NEUTRINOS
+          ELSEIF ( KODNEX .EQ.    16 ) THEN    ! NU_TAU
+            GOTO 55
+          ELSEIF ( KODNEX .EQ.   -16 ) THEN    ! ANTI-NU_TAU
+            GOTO 55
 #endif
+          ENDIF
+
+        ELSEIF ( ABS(KODNEX).GT.400 .AND. ABS(KODNEX).LT.450 ) THEN
+C  CHARMED MESONS
+#if __CHARM__
+          IF     ( KODNEX .EQ.   421 ) THEN    ! D(0)
+            KODCRS = 116
+          ELSEIF ( KODNEX .EQ.   411 ) THEN    ! D(+)
+            KODCRS = 117
+          ELSEIF ( KODNEX .EQ.  -411 ) THEN    ! D(-)
+            KODCRS = 118
+          ELSEIF ( KODNEX .EQ.  -421 ) THEN    ! ANTI-D(0)
+            KODCRS = 119
+C  CHARMED MESONS WITH STRANGENESS
+          ELSEIF ( KODNEX .EQ.   431 ) THEN    ! D_S(+)
+            KODCRS = 120
+          ELSEIF ( KODNEX .EQ.  -431 ) THEN    ! D_S(-)
+            KODCRS = 121
+C  CHARMED ETA MESON
+          ELSEIF ( KODNEX .EQ.   441  .OR.     ! ETA_C
+     *             KODNEX .EQ.  -441 ) THEN
+            KODCRS = 122
+C  EXCITED CHARMED MESONS
+          ELSEIF ( KODNEX .EQ.   423 ) THEN    ! D*(0)
+            KODCRS = 123
+          ELSEIF ( KODNEX .EQ.   413 ) THEN    ! D*(+)
+            KODCRS = 124
+          ELSEIF ( KODNEX .EQ.  -413 ) THEN    ! D*(-)
+            KODCRS = 125
+          ELSEIF ( KODNEX .EQ.  -423 ) THEN    ! ANTI-D*(0)
+            KODCRS = 126
+          ELSEIF ( KODNEX .EQ.   433 ) THEN    ! D_S*(+)
+            KODCRS = 127
+          ELSEIF ( KODNEX .EQ.  -433 ) THEN    ! D_S*(-)
+            KODCRS = 128
+          ELSEIF ( KODNEX .EQ.   443   .OR.    ! J/PSI
+     *             KODNEX .EQ.  -443 ) THEN
+            KODCRS = 130
+#else
+C  CHARMED MESONS CANNOT BE TREATED, TAKE INSTEAD STRANGE MESONS
+          IF     ( KODNEX .EQ.   421 ) THEN    ! D(0)
+            KODCRS = 11                          ! BECOMES K(+)
+          ELSEIF ( KODNEX .EQ.   411  .OR.     ! D(+)
+     *             KODNEX .EQ.  -411 ) THEN    ! D(-)
+            CALL RMMARD( RD,1,1 )
+            IF ( RD(1) .GE. 0.5D0 ) THEN
+              KODCRS = 10                        ! BECOMES K0L
+            ELSE
+              KODCRD = 16                        ! BECOMES KOS
+            ENDIF
+          ELSEIF ( KODNEX .EQ.  -421 ) THEN    ! ANTI-D(0)
+            KODCRS = 12                          ! BECOMES K(-)
+C  CHARMED MESONS WITH STRANGENESS
+          ELSEIF ( KODNEX .EQ.   431  .OR.     ! D_S((+)
+     *             KODNEX .EQ.  -431 ) THEN    ! ANTI-D_S(-)
+            CALL RMMARD( RD,1,1 )
+            IF ( RD(1) .GE. 0.5D0 ) THEN
+              KODCRS = 10                        ! BECOMES K0L
+            ELSE
+              KODCRD = 16                        ! BECOMES KOS
+            ENDIF
+C  CHARMED ETA MESON
+          ELSEIF ( KODNEX .EQ.   441  .OR.     ! ETA_C
+     *             KODNEX .EQ.  -441 ) THEN
+            KODCRS = 17                          ! BECOMES ETA
+C  EXCITED CHARMED MESONS
+          ELSEIF ( KODNEX .EQ.   423 ) THEN    ! D*(0)
+            KODCRS = 11                          ! BECOMES K(+)
+          ELSEIF ( KODNEX .EQ.   413   .OR.    ! D*(+)
+     *             KODNEX .EQ.  -413   .OR.    ! ANTI-D*(-)
+     *             KODNEX .EQ.   433   .OR.    ! D_S*(+)
+     *             KODNEX .EQ.  -433 ) THEN    ! ANTI D_S*(-)
+            CALL RMMARD( RD,1,1 )
+            IF ( RD(1) .GE. 0.5D0 ) THEN
+              KODCRS = 10                        ! BECOMES K0L
+            ELSE
+              KODCRD = 16                        ! BECOMES K0S
+            ENDIF
+          ELSEIF ( KODNEX .EQ.  -423 ) THEN    ! ANTI-D*(0)
+            KODCRS = 12                          ! BECOMES K(-)
+          ELSEIF ( KODNEX .EQ.   443   .OR.    ! J/PSI
+     *             KODNEX .EQ.  -443 ) THEN
+            KODCRS = 17                          ! BECOMES ETA
+#endif
+          ENDIF
+
+        ELSEIF ( ABS(KODNEX).GT.4000 .AND. ABS(KODNEX).LT.4500 )THEN
+C  BARYONS WITH CHARM
+#if __CHARM__
+          IF     ( KODNEX .EQ.  4122 ) THEN    ! LAMBDA_C(+)
+            KODCRS = 137
+          ELSEIF ( KODNEX .EQ.  4232 ) THEN    ! XI_C(+)
+            KODCRS = 138
+          ELSEIF ( KODNEX .EQ.  4132 ) THEN    ! XI_C(0)
+            KODCRS = 139
+          ELSEIF ( KODNEX .EQ.  4222 ) THEN    ! SIGMA_C(++)
+            KODCRS = 140
+          ELSEIF ( KODNEX .EQ.  4212 ) THEN    ! SIGMA_C(+)
+            KODCRS = 141
+          ELSEIF ( KODNEX .EQ.  4112 ) THEN    ! SIGMA_C(0)
+            KODCRS = 142
+          ELSEIF ( KODNEX .EQ.  4322 ) THEN    ! XI_C'(+)            '
+            KODCRS = 143
+          ELSEIF ( KODNEX .EQ.  4312 ) THEN    ! XI_C'(0)            '
+            KODCRS = 144
+          ELSEIF ( KODNEX .EQ.  4332 ) THEN    ! OMEGA_C(0)
+            KODCRS = 145
+          ELSEIF ( KODNEX .EQ. -4122 ) THEN    ! ANTI-LAMBDA_C(-)
+            KODCRS = 149
+          ELSEIF ( KODNEX .EQ. -4232 ) THEN    ! ANTI-XI_C(-)
+            KODCRS = 150
+          ELSEIF ( KODNEX .EQ. -4132 ) THEN    ! ANTI-XI-C(0)
+            KODCRS = 151
+          ELSEIF ( KODNEX .EQ. -4222 ) THEN    ! ANTI-SIGMA_C(--)
+            KODCRS = 152
+          ELSEIF ( KODNEX .EQ. -4212 ) THEN    ! ANTI-SIGMA_C(-)
+            KODCRS = 153
+          ELSEIF ( KODNEX .EQ. -4112 ) THEN    ! ANTI-SIGMA_C(0)
+            KODCRS = 154
+          ELSEIF ( KODNEX .EQ. -4322 ) THEN    ! ANTI-XI_C'(-)       '
+            KODCRS = 155
+          ELSEIF ( KODNEX .EQ. -4312 ) THEN    ! ANTI-XI_C'(0)       '
+            KODCRS = 156
+          ELSEIF ( KODNEX .EQ. -4332 ) THEN    ! ANTI-OMEGA_C(0)
+            KODCRS = 157
+C  EXCITED CHARMED BARYONS
+          ELSEIF ( KODNEX .EQ.  4224 ) THEN    ! SIGMA_C*(++)
+            KODCRS = 161
+          ELSEIF ( KODNEX .EQ.  4214 ) THEN    ! SIGMA_C*(+)
+            KODCRS = 162
+          ELSEIF ( KODNEX .EQ.  4114 ) THEN    ! SIGMA_C*(0)
+            KODCRS = 163
+          ELSEIF ( KODNEX .EQ. -4224 ) THEN    ! ANTI-SIGMA_C*(--)
+            KODCRS = 171
+          ELSEIF ( KODNEX .EQ. -4214 ) THEN    ! ANTI-SIGMA_C*(-)
+            KODCRS = 172
+          ELSEIF ( KODNEX .EQ. -4114 ) THEN    ! ANTI-SIGMA_C*(0)
+            KODCRS = 173
+C  DOUBLE CHARMED BARYONS CANNOT BE TREATED, TAKE CHARMED STRANGE BARYS
+          ELSEIF ( KODNEX .EQ.  4422 ) THEN    ! XI_CC(++)
+            KODCRS = 143                         ! BECOMES XI_C'(+)    '
+          ELSEIF ( KODNEX .EQ.  4412 ) THEN    ! XI_CC(+)
+            KODCRS = 144                         ! BECOMES XI_C'(0)    '
+          ELSEIF ( KODNEX .EQ.  4432 ) THEN    ! OMEGA_CC(+)
+            KODCRS = 145                         ! BECOMES OMEGA_C(0)
+          ELSEIF ( KODNEX .EQ. -4422 ) THEN    ! ANTI-XI_CC(--)
+            KODCRS = 150                         ! BECOMES ANTI-XI_C(-)
+          ELSEIF ( KODNEX .EQ. -4412 ) THEN    ! ANTI-XI_CC(-)
+            KODCRS = 156                       ! BECOMES ANTI-XI_C'(0) '
+          ELSEIF ( KODNEX .EQ. -4432 ) THEN    ! ANTI-OMEGA_CC(-)
+            KODCRS = 157                       ! BECOMES ANTI-OMEGA_C(0)
+C  TRIPLE CHARMED BARYONS CANNOT BE TREATED, TAKE CHARMED STRANGE BARYS
+          ELSEIF ( KODNEX .EQ.  4444 ) THEN    ! OMEGA_CCC(++)
+            KODCRS = 145                         ! BECOMES OMEGA_C(0)
+          ELSEIF ( KODNEX .EQ. -4444 ) THEN    ! ANTI-OMEGA_CCC(--)
+            KODCRS = 157                       ! BECOMES ANTI-OMEGA_C(0)
+#else
+C  CHARMED BARYONS CANNOT BE TREATED, TAKE INSTEAD STRANGE BARYONS
+          IF     ( KODNEX .EQ.  4122 ) THEN    ! LAMBDA_C(+)
+            KODCRS = 18                          ! BECOMES LAMBDA
+          ELSEIF ( KODNEX .EQ.  4232 ) THEN    ! XI_C(+)
+            KODCRS = 22                          ! BECOMES XI(0)
+          ELSEIF ( KODNEX .EQ.  4132 ) THEN    ! XI_C(0)
+            KODCRS = 23                          ! BECOMES XI(-)
+          ELSEIF ( KODNEX .EQ.  4222 ) THEN    ! SIGMA_C(++)
+            KODCRS = 19                          ! BECOMES SIGMA(+)
+          ELSEIF ( KODNEX .EQ.  4212 ) THEN    ! SIGMA_C(+)
+            KODCRS = 20                          ! BECOMES SIGMA(0)
+          ELSEIF ( KODNEX .EQ.  4112 ) THEN    ! SIGMA_C(0)
+            KODCRS = 21                          ! BECOMES SIGMA(-)
+          ELSEIF ( KODNEX .EQ.  4322 ) THEN    ! XI_C'(+)            '
+            KODCRS = 22                          ! BECOMES XI(0)
+          ELSEIF ( KODNEX .EQ.  4312 ) THEN    ! XI_C'(0)            '
+            KODCRS = 23                          ! BECOMES XI(-)
+          ELSEIF ( KODNEX .EQ.  4332 ) THEN    ! OMEGA_C(0)
+            KODCRS = 24                          ! BECOMES OMEGA(-)
+          ELSEIF ( KODNEX .EQ. -4122 ) THEN    ! ANTI-LAMBDA_C(-)
+            KODCRS = 26                          ! BECOMES ANTI-LAMBDA
+          ELSEIF ( KODNEX .EQ. -4232 ) THEN    ! ANTI-XI_C(-)
+            KODCRS = 30                          ! BECOMES ANTI-XI(0)
+          ELSEIF ( KODNEX .EQ. -4132 ) THEN    ! ANTI-XI-C(0)
+            KODCRS = 31                          ! BECOMES ANTI-XI(+)
+          ELSEIF ( KODNEX .EQ. -4222 ) THEN    ! ANTI-SIGMA_C(--)
+            KODCRS = 27                          ! BECOMES ANTI-SIGMA(-)
+          ELSEIF ( KODNEX .EQ. -4212 ) THEN    ! ANTI-SIGMA_C(-)
+            KODCRS = 28                          ! BECOMES ANTI-SIGMA(0)
+          ELSEIF ( KODNEX .EQ. -4112 ) THEN    ! ANTI-SIGMA_C(0)
+            KODCRS = 29                          ! BECOMES ANTI-SIGMA(+)
+          ELSEIF ( KODNEX .EQ. -4322 ) THEN    ! ANTI-XI_C'(-)       '
+            KODCRS = 30                          ! BECOMES ANTI-XI(0)
+          ELSEIF ( KODNEX .EQ. -4312 ) THEN    ! ANTI-XI_C'(0)       '
+            KODCRS = 31                          ! BECOMES ANTI-XI(+)
+          ELSEIF ( KODNEX .EQ. -4332 ) THEN    ! ANTI-OMEGA_C(0)
+            KODCRS = 32                          ! BECOMES ANTI-OMEGA(+)
+C  EXCITED CHARMED BARYONS CANNOT BE TREATED, TAKE STRANGE BARYONS
+          ELSEIF ( KODNEX .EQ.  4224 ) THEN    ! SIGMA_C*(++)
+            KODCRS = 19                          ! BECOMES SIGMA(+)
+          ELSEIF ( KODNEX .EQ.  4214 ) THEN    ! SIGMA_C*(+)
+            KODCRS = 20                          ! BECOMES SIGMA(0)
+          ELSEIF ( KODNEX .EQ.  4114 ) THEN    ! SIGMA_C*(0)
+            KODCRS = 21                          ! BECOMES SIGMA(-)
+          ELSEIF ( KODNEX .EQ. -4224 ) THEN    ! ANTI-SIGMA_C*(--)
+            KODCRS = 27                          ! BECOMES ANTI-SIGMA(-)
+          ELSEIF ( KODNEX .EQ. -4214 ) THEN    ! ANTI-SIGMA_C*(-)
+            KODCRS = 28                          ! BECOMES ANTI-SIGMA(0)
+          ELSEIF ( KODNEX .EQ. -4114 ) THEN    ! ANTI-SIGMA_C*(0)
+            KODCRS = 29                          ! BECOMES ANTI-SIGMA(+)
+C  DOUBLE CHARMED BARYONS CANNOT BE TREATED, TAKE STRANGE BARYS
+          ELSEIF ( KODNEX .EQ.  4422 ) THEN    ! XI_CC(++)
+            KODCRS = 22                          ! BECOMES XI(0)
+          ELSEIF ( KODNEX .EQ.  4412 ) THEN    ! XI_CC(+)
+            KODCRS = 23                          ! BECOMES XI(-)
+          ELSEIF ( KODNEX .EQ.  4432 ) THEN    ! OMEGA_CC(+)
+            KODCRS = 24                          ! BECOMES OMEGA(-)
+          ELSEIF ( KODNEX .EQ. -4422 ) THEN    ! ANTI-XI_CC(--)
+            KODCRS = 30                          ! BECOMES ANTI-XI(0)
+          ELSEIF ( KODNEX .EQ. -4412 ) THEN    ! ANTI-XI_CC(-)
+            KODCRS = 31                          ! BECOMES ANTI-XI(+)
+          ELSEIF ( KODNEX .EQ. -4432 ) THEN    ! ANTI-OMEGA_CC(-)
+            KODCRS = 32                          ! BECOMES ANTI-OMEGA(+)
+C  TRIPLE CHARMED BARYONS CANNOT BE TREATED, TAKE STRANGE BARYS
+          ELSEIF ( KODNEX .EQ.  4444 ) THEN    ! OMEGA_CCC*(++)
+            KODCRS = 24                          ! BECOMES OMEGA(-)
+          ELSEIF ( KODNEX .EQ. -4444 ) THEN    ! ANTI-OMEGA_CCC*(--)
+            KODCRS = 32                          ! BECOMES ANTI-OMEGA(+)
+#endif
+          ENDIF
+C  PROJECTILE FRAGMENT NUCLEUS
+        ! ELSEIF ( KODNEX .EQ. 80000 ) THEN
+        !   KODCRS = IDRES(J) * 100 + IDXRES(J)
+
         ELSE
-          WRITE(MONIOU,*)'NSTORE: UNKNOWN PARTICLE CODE IDPTL=',idptl(I)
-          GOTO 5
-        ENDIF
+          WRITE(MONIOU,*) 'HydroStore: UNKNOWN PARTICLE CODE=',KODNEX
+          STOP
+        ENDIF          
         SECPAR(0) = KODCRS
 
 C  ELIMINATE BACKWARD GOING PARTICLES
@@ -478,23 +513,11 @@ C  ELIMINATE BACKWARD GOING PARTICLES
 C  ORDINARY SECONDARY PARTICLES
           SECPAR(1) = PPTL(4,I)/PAMA(KODCRS)
 C  LOOK FOR SPECTATOR NUCLEONS
-          IF ( KODCRS .EQ. 13  .OR.  KODCRS .EQ. 14 ) THEN
-#if !__INTTEST__
-C  ELIMINATE 'ABSOLUTE' TARGET SPECTATORS
-#if __EPOS__
-            IF ( iorptl(I).GT.maproj .AND. iorptl(I).LE.maproj+matarg 
-     *     .AND. ityptl(I).EQ.0  .AND.  istptl(I).EQ.0 ) GOTO 5
-#endif
-#endif
-C  TREAT 'ABSOLUTE' PROJECTILE SPECTATORS
-#if __EPOS__
-            IF ( iorptl(I).GE.1 .AND. iorptl(I).LE.maproj 
-     *        .AND. ityptl(I).EQ.0  .AND.  istptl(I).EQ.0 ) THEN
-              IF ( infragm .EQ. 0 .AND. NFRAGM .NE. 0 ) THEN
-#endif
+          IF ( KODCRS .EQ. 13  .OR.  KODCRS .EQ. 14 .AND. nspec .gt. 0
+     &      ) THEN
+
 C  COMPOSE PROJECTILE SPECTATORS TO REMAINING NUCLEUS
-                NREST = NREST - 1
-                NNEW  = NNEW + 1
+                nspec=nspec-1
                 IF     ( KODCRS .EQ. 14 ) THEN
                   INEW  = INEW + 101
                   IREST = IREST - 101
@@ -505,10 +528,9 @@ C  COMPOSE PROJECTILE SPECTATORS TO REMAINING NUCLEUS
 #if !__INTTEST__
                 GOTO 5
 #endif
-              ENDIF
 C  DISREGARD PROJECTILE SPECTATORS FOR ELASTICITY
-              GOTO 7
-            ENDIF
+                GOTO 7
+            ! ENDIF
           ENDIF
 
 CC        IF ( SECPAR(1) .GT. GAMMAX ) THEN
@@ -719,12 +741,12 @@ C  WE HAVE ANGULAR CUT
 #endif
  5    CONTINUE
 
-      IF ( DEBUG ) WRITE(MDEBUG,*) 'NSTORE: NTGEVT,ETOT =',ntgevt,ETOT
+      IF ( DEBUG ) WRITE(MDEBUG,*) 'HydroStore:,ETOT =',ETOT
 
       IF ( NFRAGM .NE. 0  .AND.  INEW .GT. 0 ) THEN
 C  TREAT REMAINING NUCLEUS
         IF ( DEBUG ) WRITE(MDEBUG,150) INEW,(CURPAR(I),I=1,8)
- 150    FORMAT(' NSTORE: REMNNT=',1P,I10,8E10.3)
+ 150    FORMAT(' HydroStore: REMNNT=',1P,I10,8E10.3)
         SECPAR(1)  = CURPAR(1)
         SECPAR(2)  = CURPAR(2)
         SECPAR(3)  = CURPAR(3)
@@ -776,13 +798,14 @@ C  LOOP TO TREAT THE REMANENTS OF THE DESINTEGRATED FRAGMENT
           KNEW = 0
           DO  135  J = 1, JFIN
             EA = GAMMA * PAMA(ITYP(J))
-            IF (DEBUG) WRITE(MDEBUG,*) 'NSTORE: J,ITYP,EA=',
+            IF (DEBUG) WRITE(MDEBUG,*) 'HydroStore: J,ITYP,EA=',
      *                                       J,ITYP(J),EA
 C  MOMENTA SQUARED
             PTM = ( EA - PAMA(ITYP(J)) ) * ( EA + PAMA(ITYP(J)) )
             PT2 = PFRX(J)**2 + PFRY(J)**2
             IF ( PT2 .GE. PTM ) THEN
-              IF (DEBUG) WRITE(MDEBUG,*) 'NSTORE: PT REJECT PARTICLE',J
+              IF (DEBUG) WRITE(MDEBUG,*)
+     &          'HydroStore: PT REJECT PARTICLE',J
               GOTO 135
             ENDIF
             IF ( PTM .GT. 0.D0 ) THEN
@@ -823,7 +846,7 @@ C  COPY PARTICLE INFORMATION, LATER TO BECOME MOTHER PARTICLE
               ENDIF
             ELSE
               IF ( DEBUG ) WRITE(MDEBUG,*)
-     *                              'NSTORE: ANGLE REJECT PARTICLE',J
+     *                 'HydroStore: ANGLE REJECT PARTICLE',J
               IF ( LLONGI ) THEN
 C  ADD ENERGY TO LONGITUDINAL ENERGY DEPOSIT
 #if __THIN__
@@ -961,7 +984,7 @@ C  COPY PARTICLE INFORMATION, LATER TO BECOME MOTHER PARTICLE
  139  ETOT = ETOT + SECPAR(1)*(PAMA(13)*NNNEW + PAMA(14)*NZNEW)
  140  CONTINUE
       IF ( DEBUG ) WRITE(MDEBUG,1401) ELASTI,ETOT,ELABN,ETOT/ELABN
- 1401 FORMAT(1H ,'NSTORE: ELASTI,ETOT,ELABN,MISMATCH=',
+ 1401 FORMAT(1H ,'HydroStore: ELASTI,ETOT,ELABN,MISMATCH=',
      *                 F8.5,1X,2(F15.2,1X),F8.5)
 
 C  FILL ELASTICITY IN MATRICES
@@ -1019,6 +1042,6 @@ C  NUMBER OF BILLIONS
       ENDIF
 
       RETURN
-      END
+      END SUBROUTINE HydroStore
 
-      
+

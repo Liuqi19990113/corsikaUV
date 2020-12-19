@@ -9,7 +9,7 @@ export ftn13=test.f13
 export ftn14=test.f14
 export ftn15=test.f15
 export ftn16=test.f16
-export ftn19=urqmd_frez_19.txt
+export ftn19=urqmd_QGP_19.txt
 export ftn20=test.f20
 
 rm test*
