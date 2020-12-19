@@ -1,0 +1,13 @@
+FFLAGS= -Wall -fno-automatic -finit-local-zeros
+FC=f77
+FILES= \
+epos-bas-199.f  epos-con-199.f eposm.f         \
+epos-dky-199.f  epos-dro-199.f epos-ems-199.f  \
+epos-fra-199.f  epos-ico-199.f epos-hnb-199.f \
+epos-ids-199.f  epos-int-199.f epos-jps-199.f  \
+epos-omg-199.f  epos-par-199.f epos-sem-199.f  \
+epos-rsh-199.f  epos-qsh-199.f epos-tim-199.f  \
+epos-uti-199.f  epos-xan-199.f epos-xpr-199.f  \
+ 
+all: $(FILES)
+	$(FC) $(FFLAGS) -c $(FILES)
