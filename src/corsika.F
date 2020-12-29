@@ -1360,8 +1360,6 @@ C-----------------------------------------------------------------------
 *-- Author :    The CORSIKA development group   09/12/2009
 C=======================================================================
 
-
-
       SUBROUTINE CORSIKAMAIN(DUMRUNSHOWER,DUMFINISHSHOWER,DUMFINISHRUN
 #if __PARALLELIB__
      *                ,LPRIM,I1CUTPART,I2CUTPART,CFILINPU,CFILOUTP
@@ -30429,7 +30427,8 @@ C  MESONS, NUCLEONS AND STRANGE BARYONS ARE TREATED BY EPOS/NEXUS
 *    *      .OR. ( ITYPE .GE. 137  .AND.  ITYPE .LE. 157 )
 #endif
      *                                                     ) THEN
-            CALL NEXLNK
+            ! CALL NEXLNK
+            call HydroLink
           ELSE
             CALL HDPM
           ENDIF
@@ -30599,7 +30598,8 @@ C  TREAT NUCLEUS BY DPMJET, IF SELECTED AND ENERGY/NUCLEON HIGH ENOUGH
 #elif __EPOS__ || __NEXUS__
 C  TREAT NUCLEUS BY EPOS/NEXUS, IF SELECTED AND ENERGY/NUCLEON HIGH ENOUGH
         IF ( FNEXUS  .AND.  PAMA(ITYPE)*GAMMA .GT. HILOELB*IA ) THEN
-          CALL NEXLNK
+          call HydroLink
+          ! CALL NEXLNK
           RETURN
         ENDIF
 #elif __QGSJET__
@@ -65612,7 +65612,8 @@ C  PION NUCLEON,  NUCLEON NUCLEON,  KAON NUCLEON CROSS-SECTION
       RETURN
       END
 
-
+! #include "HydroLink.F"
+! #include "HydroStore.F"
 *-- Author :    D. HECK IK FZK KARLSRUHE       10/09/1998
 C=======================================================================
 

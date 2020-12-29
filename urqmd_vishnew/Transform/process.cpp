@@ -110,11 +110,11 @@ namespace Transform{
     for(int i=0;i<4;i++){
       p_sum[i]/=time_step;
     }
-    // std::cout<<time_step<<std::endl;
-    // for(int i=0;i<4;i++){
-    //   std::cout<<p_sum[i]<<' ';
-    // }
-    // std::cout<<std::endl;
+    std::cout<<time_step<<std::endl;
+    for(int i=0;i<4;i++){
+      std::cout<<p_sum[i]<<' ';
+    }
+    std::cout<<std::endl;
     input.close();
     return secondaries_num;
   }

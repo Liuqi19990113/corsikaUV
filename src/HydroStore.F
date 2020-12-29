@@ -38,7 +38,7 @@ C-----------------------------------------------------------------------
       parameter (mmry=1)
       parameter (mxptl=200000/mmry)
       integer nptl,nspec,idptl
-      real pptl,tivptl,xorptl
+      double precision pptl,tivptl,xorptl
       common/Hydro/NPROT,NNEUT,nptl,nspec,pptl(5,mxptl),idptl(mxptl)
 C-----------------------------------------------------------------------
       DOUBLE PRECISION EA,ELABN,ELASTI,EMAX,COSTET,PL2,PT2,PTM

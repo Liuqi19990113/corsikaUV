@@ -35,6 +35,7 @@ osc2u_input=osc2u_path+"/OSCAR.DAT"
 osc2u_result=osc2u_path+"/fort.14"
 osc2u_result_move=osc2u_path+"/frez_start"
 #urqmd frezout
+urqmd_QGP=urqmd_path+"/urqmd_QGP_19.txt"
 urqmd_spec=urqmd_path+"/urqmd_spec_19.txt"
 urqmd_frez_input=urqmd_path+"/frez_start"
 urqmd_frez_exec=urqmd_path+"/urqmd_frez.sh"
@@ -65,14 +66,15 @@ def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para
   
   output.write("ene {}\n".format(ene))
   output.write("nev 1\n")
-  output.write("time 4 0.1\n")
-  output.write("f13\nf15\nf16\nf20\n")
-  output.write("cto 18 1")
+  output.write("tim 4 0.1\n")
+  output.write("f13\nf15\nf16\nf20\n#f14\n#f19\n")
+  output.write("cto 18 1\n")
+  output.write("xxx")
 
 
 def run_urqmd_initial():
   os.chdir(urqmd_path)
-  os.popen(urqmd_initial_exec)
+  os.popen(urqmd_initial_exec).read()
   QGP_judge=int(os.popen(QGP_judge_exec).read())
   if(os.path.exists(transform_input)):
     os.remove(transform_input)
@@ -146,5 +148,8 @@ QGP_judge=run_urqmd_initial()
 if(QGP_judge==1):
   run_transform()
   run_vishnew()
+  run_iSS()
 run_osc2u()
 run_urqmd_frez()
+if(QGP_judge==0):
+  shutil.move(urqmd_QGP,urqmd_spec)

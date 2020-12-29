@@ -397,9 +397,9 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c particles
 
       do 99 i=1,npart
-         read(5,904) j, t_ityp(i), 
+         read(5,*) j, t_ityp(i), 
      .        t_px(i), t_py(i), t_pz(i), t_p0(i), t_fmass(i),     
-     .        t_rx(i), t_ry(i), t_rz(i), t_r0(i), t_tform(i)
+     .        t_rx(i), t_ry(i), t_rz(i), t_r0(i)
  99   continue
 
  904  format (i10,2x,i10,2x,10(D24.16,2x))

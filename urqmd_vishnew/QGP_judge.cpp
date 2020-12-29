@@ -36,8 +36,12 @@ int main(int argc,char*argv[]){
     }
   }
   // -1:non-interact 0:not hydro 1:hydro 
-  if(secondaries==spec_num)return -1;
+  if(secondaries==spec_num){
+    cout<< -1;
+    return 0;  
+  }
   const double critical_ratio=0.1;
-  if(QGP_energy/energy>critical_ratio)return 1;
-  else return 0;
+  if(QGP_energy/energy>critical_ratio)cout<< 1;
+  else cout<< 0;
+  return 0;
 }

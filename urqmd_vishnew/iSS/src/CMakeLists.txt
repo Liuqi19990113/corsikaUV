@@ -10,4 +10,4 @@ INCLUDE_DIRECTORIES(${INCLUDE_DIRS})
 ADD_EXECUTABLE (iSS  main.cpp   arsenal.cpp  ParameterReader.cpp  RandomVariable1DArray.cpp  RandomVariable2DArray.cpp  RandomVariable.cpp  TableFunction.cpp  Table.cpp  emissionfunction.cpp  readindata.cpp  Poisson.cpp  NBD.cpp  )
 TARGET_LINK_LIBRARIES (iSS ${LIBS})
 
-INSTALL(TARGETS iSS DESTINATION ${CMAKE_INSTALL_PREFIX}/iSS)
+INSTALL(TARGETS iSS DESTINATION urqmd_vishnew/iSS)

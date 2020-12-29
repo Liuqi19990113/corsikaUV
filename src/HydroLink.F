@@ -23,7 +23,7 @@ C-----------------------------------------------------------------------
       parameter (mmry=1)
       parameter (mxptl=200000/mmry)
       integer nptl,nspec,idptl
-      real pptl,tivptl,xorptl
+      double precision pptl,tivptl,xorptl
       common/Hydro/NPROT,NNEUT,nptl,nspec,pptl(5,mxptl),idptl(mxptl)
       
       nptl=0
@@ -48,7 +48,7 @@ c     judge if the particle is the particle hydro support
         !ELABN=mass0*curpar(1)/(NPROT+NNEUT)?
         ELABN=mass0*curpar(1)
       endif
-      CALL HydroRun(itype,tar,curpar(1),mass0,curpar(2),
+      CALL hydro_run(int(itype),int(tar),curpar(1),mass0,curpar(2),
      & curpar(3),curpar(4),nptl,nspec,idptl,pptl)
 
       CALL HydroStore(ELABN)

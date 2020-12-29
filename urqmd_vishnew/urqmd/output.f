@@ -1013,11 +1013,11 @@ c      timestep=dble(ttime)/dtimestep
 c now read particle-output
       nbar=0
       do 39 i=1,npart
-         read(10,210) r0(i),rx(i),ry(i),rz(i),p0(i),
-     @        px(i),py(i),pz(i),fmass(i),
-     @        ityp(i),iso3(i),charge(i),
-     @        lstcoll(i),ncoll(i),origin(i),
-     @        dectime(i),tform(i),xtotfac(i)
+         read(10,*) r0(i),rx(i),ry(i),rz(i),p0(i),
+     &        px(i),py(i),pz(i),fmass(i),
+     &        ityp(i),iso3(i),charge(i),
+     &        lstcoll(i),ncoll(i),origin(i),
+     &        dectime(i),tform(i),xtotfac(i)
       if(abs(ityp(i)).le.maxbar)nbar=nbar+1
  39   continue
       nmes=npart-nbar
