@@ -47,22 +47,20 @@ result_file=result_path+"/event"
 
 def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2):
   output=open(urqmd_para,'w')
+  A=1.6
+  R_pro=0
   #it is nucleus
   if(nucleus_judge==1):
     output.write("pro {} {}\n".format(pro_para_1,pro_para_2))
+    R_pro=A*pro_para_1**(1/3)
   else:
     output.write("PRO {} {}\n".format(pro_para_1,pro_para_2))
+    R_pro=A
   output.write("tar {} {}\n".format(tar_para_1,tar_para_2))
 
-
-  if(tar_para_1==40):
-    output.write("IMP 0. 6.85\n")
-  elif(tar_para_1==16):
-    output.write("IMP 0. 5.73\n")
-  elif(tar_para_1==14):
-    output.write("IMP 0. 6.5.59\n")
-  else:
-    output.write("IMP 0. {}\n".format(3.2*float(tar_para_1)**(1/3)))
+  R_tar=A*(tar_para_1**(1/3))
+  R=R_pro+R_tar
+  output.write("IMP 0. {}\n".format(R))
   
   output.write("ene {}\n".format(ene))
   output.write("nev 1\n")
@@ -81,8 +79,7 @@ def run_urqmd_initial():
   if(os.path.exists(urqmd_spec)):
     os.remove(urqmd_spec)
   if(QGP_judge==-1):
-    run_urqmd_initial()
-    return
+    return run_urqmd_initial()
   elif(QGP_judge==1):
     shutil.move(urqmd_initial_result14,transform_input)
     shutil.move(urqmd_initial_result19,urqmd_spec)
@@ -149,7 +146,9 @@ if(QGP_judge==1):
   run_transform()
   run_vishnew()
   run_iSS()
+  # shutil.move(iss_result,urqmd_QGP)
 run_osc2u()
 run_urqmd_frez()
 if(QGP_judge==0):
-  shutil.move(urqmd_QGP,urqmd_spec)
+  os.rename(urqmd_QGP,urqmd_spec)
+  # os.rename(urqmd_initial_result19,urqmd_spec)

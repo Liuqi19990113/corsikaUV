@@ -40,8 +40,9 @@ int main(int argc,char*argv[]){
     cout<< -1;
     return 0;  
   }
-  const double critical_ratio=0.1;
-  if(QGP_energy/energy>critical_ratio)cout<< 1;
+  //the energy which will create QGP
+  const double critical_energy=8000;
+  if(QGP_energy>=critical_energy)cout<< 1;
   else cout<< 0;
   return 0;
 }

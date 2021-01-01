@@ -133,15 +133,6 @@ void hydro_run_(const int&proj_id,const int&tar,const double&gamma,const double&
       p_sum[j]+=pptl[i][j];
     }
   }
-  //test part
-  {
-    cout<<"from c++"<<endl;
-    cout<<endl;
-    for(int i=0;i<4;i++){
-      cout<<p_sum[i]<<' ';
-    }
-    cout<<endl;
-  }
 }
 
 
@@ -153,6 +144,9 @@ void ReadHydro(double beta[4],int&nptl,int&nspec,int idptl[],double pptl[][5]){
   ifstream input_QGP(input_file_QGP.c_str());
   string data_line;
   stringstream input_line;
+
+  double energy_cms=0;
+
   //judge if use hydro
   bool QGP_judge=false;
   if(input_QGP){
@@ -185,6 +179,7 @@ void ReadHydro(double beta[4],int&nptl,int&nspec,int idptl[],double pptl[][5]){
       input_line>>p[1]>>p[2]>>p[3]>>p[0];
       input_line>>mass;
       idptl[nptl]=pdg;
+      energy_cms+=p[0];
       LorentzTransform(beta,p);
       for(int i=0;i<3;i++){
         pptl[nptl][i]=p[i+1];
@@ -266,6 +261,7 @@ void ReadHydro(double beta[4],int&nptl,int&nspec,int idptl[],double pptl[][5]){
         idptl[nptl]=pdg;
         // to cms system
         LorentzTransform(beta_spec,p);
+        energy_cms+=p[0];
         // to lab system
         LorentzTransform(beta,p);
         for(int i=0;i<3;i++){

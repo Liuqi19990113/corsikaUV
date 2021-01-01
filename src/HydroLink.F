@@ -26,6 +26,8 @@ C-----------------------------------------------------------------------
       double precision pptl,tivptl,xorptl
       common/Hydro/NPROT,NNEUT,nptl,nspec,pptl(5,mxptl),idptl(mxptl)
       
+
+      write(*,*)"enter HydroLink"
       nptl=0
       nspec=0
       NPROT=0
@@ -48,6 +50,12 @@ c     judge if the particle is the particle hydro support
         !ELABN=mass0*curpar(1)/(NPROT+NNEUT)?
         ELABN=mass0*curpar(1)
       endif
+c     judge if it reach LHC energy 
+      if(ELABN < 1e7) then
+        CALL NEXLNK
+        RETURN
+      endif
+
       CALL hydro_run(int(itype),int(tar),curpar(1),mass0,curpar(2),
      & curpar(3),curpar(4),nptl,nspec,idptl,pptl)
 
