@@ -17,6 +17,7 @@ C-----------------------------------------------------------------------
 #define __TSTINTINC__
 #endif
 #include "corsika.h"
+#include "config.h"
       double precision mass0,ELABN
       integer NPROT,NNEUT
       integer mmry,mxptl

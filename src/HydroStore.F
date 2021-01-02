@@ -32,6 +32,7 @@ C-----------------------------------------------------------------------
 #define __TSTINTINC__
 #endif
 #include "corsika.h"
+#include "config.h"
 
       integer NPROT,NNEUT,maproj,KODCRD
       integer mmry,mxptl
