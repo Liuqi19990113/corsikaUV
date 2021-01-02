@@ -40,8 +40,11 @@ int main(int argc,char*argv[]){
     cout<< -1;
     return 0;  
   }
+  //test 
+  cout<<0;
+  return 0;
   //the energy which will create QGP
-  const double critical_energy=8000;
+  const double critical_energy=100000;
   if(QGP_energy>=critical_energy)cout<< 1;
   else cout<< 0;
   return 0;

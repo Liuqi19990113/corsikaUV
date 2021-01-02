@@ -47,7 +47,7 @@ result_file=result_path+"/event"
 
 def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2):
   output=open(urqmd_para,'w')
-  A=1.6
+  A=3
   R_pro=0
   #it is nucleus
   if(nucleus_judge==1):

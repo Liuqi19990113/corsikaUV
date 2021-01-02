@@ -25,9 +25,11 @@ C-----------------------------------------------------------------------
       integer nptl,nspec,idptl
       double precision pptl,tivptl,xorptl
       common/Hydro/NPROT,NNEUT,nptl,nspec,pptl(5,mxptl),idptl(mxptl)
+      ! test variable
+      double precision::p_sum(4)=0
+      integer i,j
       
 
-      write(*,*)"enter HydroLink"
       nptl=0
       nspec=0
       NPROT=0
@@ -56,9 +58,21 @@ c     judge if it reach LHC energy
         RETURN
       endif
 
+      write(*,*)"enter HydroLink"
+      
       CALL hydro_run(int(itype),int(tar),curpar(1),mass0,curpar(2),
      & curpar(3),curpar(4),nptl,nspec,idptl,pptl)
 
       CALL HydroStore(ELABN)
+      ! test process
+      do i=1,nptl
+        do j=1,4
+          p_sum(j)=pptl(j,i)+p_sum(j)
+        enddo
+      enddo
+      write(*,*)"ELABN=",ELABN
+      write(*,*)nptl,nspec
+      write(*,*)"cms",sqrt(p_sum(4)**2-p_sum(3)**2-
+     & p_sum(2)**2-p_sum(1)**2)
       RETURN
       END SUBROUTINE HydroLink

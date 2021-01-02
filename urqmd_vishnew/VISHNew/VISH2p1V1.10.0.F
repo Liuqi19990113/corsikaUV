@@ -1375,42 +1375,42 @@ CSHEN===end=====================================================================
          Write(*,'(500e12.3)')(Temp(I,J,NZ0)*Hc,J=0,NYPhy,20 )
 203   continue
          Write(*,*)
-        OPEN(111,FILE="./Initial/ed_history.dat",STATUS="OLD",
-     & FORM="UNFORMATTED",POSITION="APPEND",
-     & ACCESS="STREAM")
-        Do I=NXPhy0,NXPhy
-          Do J=NYPhy0,NYPhy
-            ! Write (111,'(E20.8)',Advance="NO") Ed(I,J,1)
-            Write (111) Ed(I,J,1)
-          End Do
-            ! Write (111,*)
-          Write (111)
-        End Do
-        Close(111)
-        OPEN(111,FILE="./Initial/u1_history.dat",STATUS="OLD",
-     & FORM="UNFORMATTED",POSITION="APPEND",
-     & ACCESS="STREAM")
-          Do I=NXPhy0,NXPhy
-            Do J=NYPhy0,NYPhy
-              ! Write (111,'(E20.8)',Advance="NO") Ed(I,J,1)
-              Write (111) U1(I,J,1)
-            End Do
-              ! Write (111,*)
-            Write (111)
-          End Do
-          Close(111)
-          OPEN(111,FILE="./Initial/u2_history.dat",STATUS="OLD",
-     & FORM="UNFORMATTED",POSITION="APPEND",
-     & ACCESS="STREAM")
-               Do I=NXPhy0,NXPhy
-                 Do J=NYPhy0,NYPhy
-                   ! Write (111,'(E20.8)',Advance="NO") Ed(I,J,1)
-                   Write (111) U2(I,J,1)
-                 End Do
-                   ! Write (111,*)
-                 Write (111)
-               End Do
-               Close(111)
+    !     OPEN(111,FILE="./Initial/ed_history.dat",STATUS="OLD",
+    !  & FORM="UNFORMATTED",POSITION="APPEND",
+    !  & ACCESS="STREAM")
+    !     Do I=NXPhy0,NXPhy
+    !       Do J=NYPhy0,NYPhy
+    !         ! Write (111,'(E20.8)',Advance="NO") Ed(I,J,1)
+    !         Write (111) Ed(I,J,1)
+    !       End Do
+    !         ! Write (111,*)
+    !       Write (111)
+    !     End Do
+    !     Close(111)
+    !     OPEN(111,FILE="./Initial/u1_history.dat",STATUS="OLD",
+    !  & FORM="UNFORMATTED",POSITION="APPEND",
+    !  & ACCESS="STREAM")
+    !       Do I=NXPhy0,NXPhy
+    !         Do J=NYPhy0,NYPhy
+    !           ! Write (111,'(E20.8)',Advance="NO") Ed(I,J,1)
+    !           Write (111) U1(I,J,1)
+    !         End Do
+    !           ! Write (111,*)
+    !         Write (111)
+    !       End Do
+    !       Close(111)
+    !       OPEN(111,FILE="./Initial/u2_history.dat",STATUS="OLD",
+    !  & FORM="UNFORMATTED",POSITION="APPEND",
+    !  & ACCESS="STREAM")
+    !            Do I=NXPhy0,NXPhy
+    !              Do J=NYPhy0,NYPhy
+    !                ! Write (111,'(E20.8)',Advance="NO") Ed(I,J,1)
+    !                Write (111) U2(I,J,1)
+    !              End Do
+    !                ! Write (111,*)
+    !              Write (111)
+    !            End Do
+    !            Close(111)
 
 
       Print*, 'Center Energy Density',  Ed(0,0,NZ0)*HBarC
