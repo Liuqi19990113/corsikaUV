@@ -32,7 +32,6 @@ C-----------------------------------------------------------------------
 #define __TSTINTINC__
 #endif
 #include "corsika.h"
-#include "config.h"
 
       integer NPROT,NNEUT,maproj,KODCRD
       integer mmry,mxptl
@@ -70,6 +69,7 @@ c  definition of the COAST crs::CInteraction class
 #endif
 C-----------------------------------------------------------------------
 
+      IF ( DEBUG ) WRITE(MDEBUG,*) 'DEBUG=',DEBUG
       IF ( DEBUG ) WRITE(MDEBUG,*) 'HydroStore:'
 
 C  NUMBER OF SPECTATORS OF REMAINING NUCLEUS IS NREST

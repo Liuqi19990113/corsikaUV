@@ -13,11 +13,13 @@ C-----------------------------------------------------------------------
 #define __RANDPAINC__
 #define __RESTINC__
 #define __RUNPARINC__
+
+#define __THNVARINC__
+
 #if __INTTEST__
 #define __TSTINTINC__
 #endif
 #include "corsika.h"
-#include "config.h"
       double precision mass0,ELABN
       integer NPROT,NNEUT
       integer mmry,mxptl
@@ -59,7 +61,7 @@ c     judge if it reach LHC energy
         RETURN
       endif
 
-      write(*,*)"enter HydroLink"
+      write(*,*)"HydroLink: "
       
       CALL hydro_run(int(itype),int(tar),curpar(1),mass0,curpar(2),
      & curpar(3),curpar(4),nptl,nspec,idptl,pptl)
@@ -71,9 +73,10 @@ c     judge if it reach LHC energy
           p_sum(j)=pptl(j,i)+p_sum(j)
         enddo
       enddo
-      write(*,*)"ELABN=",ELABN
+      write(*,*)" ELABN=",ELABN
       write(*,*)nptl,nspec
-      write(*,*)"cms",sqrt(p_sum(4)**2-p_sum(3)**2-
+      write(*,*)" cms",sqrt(p_sum(4)**2-p_sum(3)**2-
      & p_sum(2)**2-p_sum(1)**2)
+      write(*,*)"INT_ICOUNT=",INT_ICOUNT
       RETURN
       END SUBROUTINE HydroLink
