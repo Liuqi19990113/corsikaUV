@@ -118,7 +118,6 @@ void hydro_run_(const int&proj_id,const int&tar,const double&gamma,const double&
   else{
     HydroPython(ene,nucleus_judge,pro_pid,pro_iso3,tar_A,tar_Z);
   }
-
   //beta
   double momentum=sqrt(gamma*gamma-1)*m_pro;
   const double beta0=momentum/(E_pro+m_tar);
@@ -141,7 +140,6 @@ void ReadHydro(double beta[4],int&nptl,int&nspec,int idptl[],double pptl[][5]){
   string input_file_QGP="./urqmd_vishnew/urqmd/urqmd_QGP_19.txt";
   string input_file_spec="./urqmd_vishnew/urqmd/urqmd_spec_19.txt";
   nptl=0;
-  
   ifstream input_QGP(input_file_QGP.c_str());
   string data_line;
   stringstream input_line;
@@ -193,19 +191,18 @@ void ReadHydro(double beta[4],int&nptl,int&nspec,int idptl[],double pptl[][5]){
       nptl++;
     }
     input_QGP.close();
-  }
+    for(int i=0;i<3;i++){
+      beta_QGP[i]=p_QGP[i]/p_QGP[3];
+    }
+    beta_QGP[3]=1/sqrt(1-beta_QGP[1]*beta_QGP[1]-beta_QGP[2]*beta_QGP[2]-beta_QGP[0]*beta_QGP[0]);
 
-  for(int i=0;i<3;i++){
-    beta_QGP[i]=p_QGP[i]/p_QGP[3];
-  }
-  beta_QGP[3]=1/sqrt(1-beta_QGP[1]*beta_QGP[1]-beta_QGP[2]*beta_QGP[2]-beta_QGP[0]*beta_QGP[0]);
-
-  for(int i=0;i<nptl;i++){
-    // to cms system
-    LorentzTransform(beta_QGP,pptl[i]);
-    energy_cms+=pptl[i][3];
-    // to lab system
-    LorentzTransform(beta,pptl[i]);
+    for(int i=0;i<nptl;i++){
+      // to cms system
+      LorentzTransform(beta_QGP,pptl[i]);
+      energy_cms+=pptl[i][3];
+      // to lab system
+      LorentzTransform(beta,pptl[i]);
+    }
   }
 
   //get beta of spectator

@@ -43,8 +43,7 @@ c     judge if the particle is the particle hydro support
         CALL NEXLNK
         RETURN
       endif
-      if(.true.) goto 5
-5     write(*,*)5 
+
       if(itype<200) then
         mass0=PAMA(itype)
         ELABN=mass0*curpar(1)
@@ -66,7 +65,12 @@ c     judge if it reach LHC energy
       CALL hydro_run(int(itype),int(tar),curpar(1),mass0,curpar(2),
      & curpar(3),curpar(4),nptl,nspec,idptl,pptl)
 
+      write(*,*)"finish hydro_run"
+
       CALL HydroStore(ELABN)
+
+      write(*,*)"finish hydrostore"
+      
       ! test process
       do i=1,nptl
         do j=1,4
