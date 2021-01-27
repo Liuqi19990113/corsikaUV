@@ -39,7 +39,7 @@ C-----------------------------------------------------------------------
       NNEUT=0
 c     judge if the particle is the particle hydro support  
       if(.not.(itype >= 200 .or. (itype>=7 .and. itype<=9) .or. 
-     & (itype>=14 .and. itype<=15))) then
+     & (itype>=13 .and. itype<=15))) then
         CALL NEXLNK
         RETURN
       endif

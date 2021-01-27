@@ -60,6 +60,11 @@ void hydro_run_(const int&proj_id,const int&tar,const double&gamma,const double&
       pro_pid=1;
       pro_iso3=1;
     }
+    else if(proj_id==13){
+      //n
+      pro_pid=1;
+      pro_iso3=-1;
+    }
     else if(proj_id==15){
       //p-
       pro_pid=-1;
