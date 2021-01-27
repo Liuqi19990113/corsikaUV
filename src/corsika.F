@@ -65612,8 +65612,6 @@ C  PION NUCLEON,  NUCLEON NUCLEON,  KAON NUCLEON CROSS-SECTION
       RETURN
       END
 
-#include "HydroLink.F"
-#include "HydroStore.F"
 
 *-- Author :    D. HECK IK FZK KARLSRUHE       10/09/1998
 C=======================================================================

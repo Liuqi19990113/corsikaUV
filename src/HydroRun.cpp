@@ -291,4 +291,9 @@ void ReadHydro(double beta[4],int&nptl,int&nspec,int idptl[],double pptl[][5]){
   if(QGP_judge){
     cout<<"have QGP\n";
   }
+  else
+  {
+    cout<<"only urqmd\n";
+  }
+  
 }

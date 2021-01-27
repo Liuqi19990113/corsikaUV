@@ -60,16 +60,13 @@ c     judge if it reach LHC energy
         RETURN
       endif
 
-      write(*,*)"HydroLink: "
+      write(*,*)"HydroLink: itype=",itype," tar=",tar
       
       CALL hydro_run(int(itype),int(tar),curpar(1),mass0,curpar(2),
      & curpar(3),curpar(4),nptl,nspec,idptl,pptl)
 
       write(*,*)"finish hydro_run"
 
-      CALL HydroStore(ELABN)
-
-      write(*,*)"finish hydrostore"
       
       ! test process
       do i=1,nptl
@@ -82,5 +79,10 @@ c     judge if it reach LHC energy
       write(*,*)" cms",sqrt(p_sum(4)**2-p_sum(3)**2-
      & p_sum(2)**2-p_sum(1)**2)
       write(*,*)"INT_ICOUNT=",INT_ICOUNT
+
+      CALL HydroStore(ELABN)
+  
+      write(*,*)"finish hydrostore"
+
       RETURN
       END SUBROUTINE HydroLink
