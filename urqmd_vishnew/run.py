@@ -2,6 +2,7 @@ import os
 import shutil
 import sys
 import numpy as np
+import random
 
 root_path=sys.path[0]
 # urqmd initial variable
@@ -10,7 +11,8 @@ urqmd_initial_exec=urqmd_path+"/urqmd_initial.sh"
 urqmd_initial_result14=urqmd_path+"/urqmd_initial_14.txt"
 urqmd_initial_result19=urqmd_path+"/urqmd_initial_19.txt"
 initial_path=root_path+"/Initial"
-urqmd_para=urqmd_path+"/input_initial"
+urqmd_para_1=urqmd_path+"/input_initial_4"
+urqmd_para_2=urqmd_path+"/input_initial_8000"
 QGP_judge_exec=urqmd_path+"/QGP_judge"
 # transform variable
 transform_path=root_path+"/transform"
@@ -46,7 +48,8 @@ result_file=result_path+"/event"
   
 
 def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2):
-  output=open(urqmd_para,'w')
+  seed=random.randint(0,2**15-1)
+  output=open(urqmd_para_1,'w')
   A=3
   R_pro=0
   #it is nucleus
@@ -61,7 +64,7 @@ def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para
   R_tar=A*(tar_para_1**(1/3))
   R=R_pro+R_tar
   output.write("IMP 0. {}\n".format(R))
-  
+  output.write("rsd {}\n".format(seed))
   output.write("ene {}\n".format(ene))
   output.write("nev 1\n")
   output.write("tim 4 0.1\n")
@@ -69,24 +72,50 @@ def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para
   output.write("cto 18 1\n")
   output.write("xxx")
 
+  output.close()
 
-def run_urqmd_initial():
+  output=open(urqmd_para_2,'w')
+  A=3
+  R_pro=0
+  #it is nucleus
+  if(nucleus_judge==1):
+    output.write("pro {} {}\n".format(pro_para_1,pro_para_2))
+    R_pro=A*pro_para_1**(1/3)
+  else:
+    output.write("PRO {} {}\n".format(pro_para_1,pro_para_2))
+    R_pro=A
+  output.write("tar {} {}\n".format(tar_para_1,tar_para_2))
+
+  R_tar=A*(tar_para_1**(1/3))
+  R=R_pro+R_tar
+  output.write("IMP 0. {}\n".format(R))
+  output.write("rsd {}\n".format(seed))
+  output.write("ene {}\n".format(ene))
+  output.write("nev 1\n")
+  output.write("tim 8000 8000\n")
+  output.write("f13\nf15\nf16\nf20\nf14\n#f19\n")
+  output.write("cto 18 1\n")
+  output.write("xxx")
+
+  output.close()
+
+
+def run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2):
+  write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
+  if(os.path.exists(transform_input)):
+    os.remove(transform_input)
+  if(os.path.exists(urqmd_QGP)):
+    os.remove(urqmd_QGP)
+  if(os.path.exists(urqmd_spec)):
+    os.remove(urqmd_spec)
   os.chdir(urqmd_path)
   os.popen(urqmd_initial_exec).read()
   QGP_judge=int(os.popen(QGP_judge_exec).read())
-  if(os.path.exists(transform_input)):
-    os.remove(transform_input)
-  if(os.path.exists(urqmd_spec)):
-    os.remove(urqmd_spec)
   if(QGP_judge==-1):
-    return run_urqmd_initial()
+    return run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
   elif(QGP_judge==1):
     shutil.move(urqmd_initial_result14,transform_input)
-    shutil.move(urqmd_initial_result19,urqmd_spec)
-    return QGP_judge
-  elif(QGP_judge==0):
-    shutil.move(urqmd_initial_result19,osc2u_input)
-    return QGP_judge
+  return QGP_judge
 
 
 
@@ -139,16 +168,15 @@ pro_para_1=int(sys.argv[3])
 pro_para_2=int(sys.argv[4])
 tar_para_1=int(sys.argv[5])
 tar_para_2=int(sys.argv[6])
-write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
 
-QGP_judge=run_urqmd_initial()
+QGP_judge=run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
 if(QGP_judge==1):
   run_transform()
   run_vishnew()
   run_iSS()
   # shutil.move(iss_result,urqmd_QGP)
-run_osc2u()
-run_urqmd_frez()
-if(QGP_judge==0):
-  os.rename(urqmd_QGP,urqmd_spec)
+  run_osc2u()
+  run_urqmd_frez()
+# if(QGP_judge==0):
+#   os.rename(urqmd_QGP,urqmd_spec)
   # os.rename(urqmd_initial_result19,urqmd_spec)

@@ -288,7 +288,9 @@ void ReadHydro(double beta[4],int&nptl,int&nspec,int idptl[],double pptl[][5]){
         }
         pptl[nptl][4]=mass;
         nptl++;
-        nspec++;
+        if(x[3]==0){
+          nspec++;
+        }
       }
     }
     input_spec.close();
