@@ -25,9 +25,10 @@ C-----------------------------------------------------------------------
       integer mmry,mxptl
       parameter (mmry=1)
       parameter (mxptl=200000/mmry)
-      integer nptl,nspec,idptl
+      integer nptl,nspec,idptl,spec_judge
       double precision pptl,tivptl,xorptl
-      common/Hydro/NPROT,NNEUT,nptl,nspec,pptl(5,mxptl),idptl(mxptl)
+      common/Hydro/NPROT,NNEUT,nptl,nspec,pptl(5,mxptl),idptl(mxptl),
+     & spec_judge(mxptl)
       ! test variable
       double precision::p_sum(4)=0
       integer i,j
@@ -63,7 +64,7 @@ c     judge if it reach LHC energy
       write(*,*)"HydroLink: itype=",itype," tar=",tar
       
       CALL hydro_run(int(itype),int(tar),curpar(1),mass0,curpar(2),
-     & curpar(3),curpar(4),nptl,nspec,idptl,pptl)
+     & curpar(3),curpar(4),nptl,nspec,idptl,pptl,spec_judge)
 
       write(*,*)"finish hydro_run"
 
@@ -78,7 +79,6 @@ c     judge if it reach LHC energy
       write(*,*)nptl,nspec
       write(*,*)" cms",sqrt(p_sum(4)**2-p_sum(3)**2-
      & p_sum(2)**2-p_sum(1)**2)
-      write(*,*)"INT_ICOUNT=",INT_ICOUNT
 
       CALL HydroStore(ELABN)
   

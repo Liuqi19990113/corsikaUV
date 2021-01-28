@@ -1,9 +1,9 @@
 #!/bin/bash
 
 i=2
-seed1=1
-seed2=1
-seed3=1
+seed1=$RANDOM
+seed2=$RANDOM
+seed3=$RANDOM
 rm ./UV_corsika/DAT* 
 rm ./UV_corsika/result.txt
 ./CORSIKA <<EOF >./UV_corsika/result.txt
@@ -43,7 +43,7 @@ MAXPRT  10                             max. number of printed events
 DIRECT  ./UV_corsika/                              output directory
 *OUTFILE ./UV_corsika/inter1st.dat                  secondary particles of first interaction
 USER    qinjian                        user 
-DEBUG   F  6  F  1000000              debug flag and log.unit for outer
+DEBUG   T  6  F  1000000              debug flag and log.unit for outer
 EXIT                                   terminates input
 EOF
 

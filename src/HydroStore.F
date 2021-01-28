@@ -37,9 +37,10 @@ C-----------------------------------------------------------------------
       integer mmry,mxptl
       parameter (mmry=1)
       parameter (mxptl=200000/mmry)
-      integer nptl,nspec,idptl
+      integer nptl,nspec,idptl,spec_judge
       double precision pptl,tivptl,xorptl
-      common/Hydro/NPROT,NNEUT,nptl,nspec,pptl(5,mxptl),idptl(mxptl)
+      common/Hydro/NPROT,NNEUT,nptl,nspec,pptl(5,mxptl),idptl(mxptl),
+     & spec_judge(mxptl)
 C-----------------------------------------------------------------------
       DOUBLE PRECISION EA,ELABN,ELASTI,EMAX,COSTET,PL2,PT2,PTM
 CC    DOUBLE PRECISION GAMMAX
@@ -71,6 +72,7 @@ C-----------------------------------------------------------------------
 
       IF ( DEBUG ) WRITE(MDEBUG,*) 'DEBUG=',DEBUG
       IF ( DEBUG ) WRITE(MDEBUG,*) 'HydroStore:'
+      IF ( DEBUG ) WRITE(MDEBUG,*) 'nptl,nspec=:',nptl,nspec
 
 C  NUMBER OF SPECTATORS OF REMAINING NUCLEUS IS NREST
       IREST = ITYPE
@@ -514,8 +516,7 @@ C  ELIMINATE BACKWARD GOING PARTICLES
 C  ORDINARY SECONDARY PARTICLES
           SECPAR(1) = PPTL(4,I)/PAMA(KODCRS)
 C  LOOK FOR SPECTATOR NUCLEONS
-          IF ( KODCRS .EQ. 13  .OR.  KODCRS .EQ. 14 .AND. nspec .gt. 0
-     &      ) THEN
+          IF ( spec_judge(I) .eq. 1 ) THEN
 
 C  COMPOSE PROJECTILE SPECTATORS TO REMAINING NUCLEUS
                 nspec=nspec-1

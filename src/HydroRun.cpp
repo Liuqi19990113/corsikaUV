@@ -10,9 +10,9 @@
 using namespace std;
 extern "C"{
   /**run hydro from corsika*/
-  void hydro_run_(const int&proj_id,const int&tar,const double&gamma,const double&m_pro,const double&cos_x,const double&cos_y,const double&cos_z,int&nptl,int&nspec,int idptl[],double pptl[][5]);
+  void hydro_run_(const int&proj_id,const int&tar,const double&gamma,const double&m_pro,const double&cos_x,const double&cos_y,const double&cos_z,int&nptl,int&nspec,int idptl[],double pptl[][5],int spec_judge[]);
   /**read particle from hydro output file*/
-  void ReadHydro(double beta[4],int&nptl,int&nspec,int idptl[],double pptl[][5]);
+  void ReadHydro(double beta[4],int&nptl,int&nspec,int idptl[],double pptl[][5],int spec_judge[]);
   /**do Lorentz transformation from (p[0],p[1],p[2],p[3]) to (px,py,pz,E)*/
   void LorentzTransform(const double beta[4],double p[4]);
   /**use python shell to get particle information*/
@@ -38,7 +38,7 @@ void HydroPython(double ene,int nucleus_judge,int pro_para_1,int pro_para_2,int 
   system(command);
 }
 
-void hydro_run_(const int&proj_id,const int&tar,const double&gamma,const double&m_pro,const double&cos_x,const double&cos_y,const double&cos_z,int&nptl,int&nspec,int idptl[],double pptl[][5]){
+void hydro_run_(const int&proj_id,const int&tar,const double&gamma,const double&m_pro,const double&cos_x,const double&cos_y,const double&cos_z,int&nptl,int&nspec,int idptl[],double pptl[][5],int spec_judge[]){
   //initial the particle information
   //mass of proton and neutron
   const double m_p=0.938272013,m_n=0.939565346;
@@ -131,17 +131,12 @@ void hydro_run_(const int&proj_id,const int&tar,const double&gamma,const double&
   beta[3]=gamma0;
   //set beta to transform from cms to lab
   beta[0]=-beta0*cos_x,beta[1]=-beta0*cos_y,beta[2]=-beta0*cos_z;
-  ReadHydro(beta,nptl,nspec,idptl,pptl);
-  double p_sum[4]={0};
-  for(int i=0;i<nptl;i++){
-    for(int j=0;j<4;j++){
-      p_sum[j]+=pptl[i][j];
-    }
-  }
+  ReadHydro(beta,nptl,nspec,idptl,pptl,spec_judge);
+  return;
 }
 
 
-void ReadHydro(double beta[4],int&nptl,int&nspec,int idptl[],double pptl[][5]){
+void ReadHydro(double beta[4],int&nptl,int&nspec,int idptl[],double pptl[][5],int spec_judge[]){
   string input_file_QGP="./urqmd_vishnew/urqmd/urqmd_QGP_19.txt";
   string input_file_spec="./urqmd_vishnew/urqmd/urqmd_spec_19.txt";
   nptl=0;
@@ -155,59 +150,6 @@ void ReadHydro(double beta[4],int&nptl,int&nspec,int idptl[],double pptl[][5]){
   bool QGP_judge=false;
   if(input_QGP){
     QGP_judge=true;
-  }
-  //begin QGP
-
-  double beta_QGP[4]={0};
-  double p_QGP[4]={0};
-  if(input_QGP){
-    //remove header
-    for(int i=0;i<4;i++){
-      data_line.clear();
-      getline(input_QGP,data_line);
-    }
-    while(true){
-      data_line.clear();
-      getline(input_QGP,data_line);
-      if(input_QGP.eof())break;
-      input_line.clear();
-      input_line.str(data_line);
-      double p[4]={0};
-      double pdg=0;
-      double counter=0;
-      double mass=0;
-      //frezout position
-      double x[4]={0};
-      //particle counter
-      input_line>>counter;
-      //pdg id
-      input_line>>pdg;
-      //momentum
-      input_line>>p[0]>>p[1]>>p[2]>>p[3];
-      input_line>>mass;
-      idptl[nptl]=pdg;
-      // energy_cms+=p[3];
-      // LorentzTransform(beta,p);
-      for(int i=0;i<4;i++){
-        pptl[nptl][i]=p[i];
-        p_QGP[i]+=p[i];
-      }
-      pptl[nptl][4]=mass;
-      nptl++;
-    }
-    input_QGP.close();
-    for(int i=0;i<3;i++){
-      beta_QGP[i]=p_QGP[i]/p_QGP[3];
-    }
-    beta_QGP[3]=1/sqrt(1-beta_QGP[1]*beta_QGP[1]-beta_QGP[2]*beta_QGP[2]-beta_QGP[0]*beta_QGP[0]);
-
-    for(int i=0;i<nptl;i++){
-      // to cms system
-      LorentzTransform(beta_QGP,pptl[i]);
-      energy_cms+=pptl[i][3];
-      // to lab system
-      LorentzTransform(beta,pptl[i]);
-    }
   }
 
   //get beta of spectator
@@ -278,6 +220,11 @@ void ReadHydro(double beta[4],int&nptl,int&nspec,int idptl[],double pptl[][5]){
       //if use QGP, only spectator,if not use QGP, all particle
       if(x[3]==0||!QGP_judge){
         idptl[nptl]=pdg;
+        spec_judge[nptl]=0;
+        if(x[3]==0){
+          nspec++;
+          spec_judge[nptl]=1;
+        }
         // to cms system
         LorentzTransform(beta_spec,p);
         energy_cms+=p[3];
@@ -288,13 +235,68 @@ void ReadHydro(double beta[4],int&nptl,int&nspec,int idptl[],double pptl[][5]){
         }
         pptl[nptl][4]=mass;
         nptl++;
-        if(x[3]==0){
-          nspec++;
-        }
       }
     }
     input_spec.close();
   }
+
+  //begin QGP
+
+  double beta_QGP[4]={0};
+  double p_QGP[4]={0};
+  if(input_QGP){
+    //remove header
+    for(int i=0;i<4;i++){
+      data_line.clear();
+      getline(input_QGP,data_line);
+    }
+    while(true){
+      data_line.clear();
+      getline(input_QGP,data_line);
+      if(input_QGP.eof())break;
+      input_line.clear();
+      input_line.str(data_line);
+      double p[4]={0};
+      double pdg=0;
+      double counter=0;
+      double mass=0;
+      //frezout position
+      double x[4]={0};
+      //particle counter
+      input_line>>counter;
+      //pdg id
+      input_line>>pdg;
+      //momentum
+      input_line>>p[0]>>p[1]>>p[2]>>p[3];
+      input_line>>mass;
+      idptl[nptl]=pdg;
+      // energy_cms+=p[3];
+      // LorentzTransform(beta,p);
+      for(int i=0;i<4;i++){
+        pptl[nptl][i]=p[i];
+        p_QGP[i]+=p[i];
+      }
+      pptl[nptl][4]=mass;
+      spec_judge[nptl]=0;
+      nptl++;
+    }
+    input_QGP.close();
+    for(int i=0;i<3;i++){
+      beta_QGP[i]=p_QGP[i]/p_QGP[3];
+    }
+    beta_QGP[3]=1/sqrt(1-beta_QGP[1]*beta_QGP[1]-beta_QGP[2]*beta_QGP[2]-beta_QGP[0]*beta_QGP[0]);
+
+    for(int i=nspec;i<nptl;i++){
+      // to cms system
+      LorentzTransform(beta_QGP,pptl[i]);
+      energy_cms+=pptl[i][3];
+      // to lab system
+      LorentzTransform(beta,pptl[i]);
+    }
+  }
+
+
+
   if(QGP_judge){
     cout<<"have QGP\n";
   }
