@@ -70,10 +70,6 @@ c  definition of the COAST crs::CInteraction class
 #endif
 C-----------------------------------------------------------------------
 
-      IF ( DEBUG ) WRITE(MDEBUG,*) 'DEBUG=',DEBUG
-      IF ( DEBUG ) WRITE(MDEBUG,*) 'HydroStore:'
-      IF ( DEBUG ) WRITE(MDEBUG,*) 'nptl,nspec=:',nptl,nspec
-
 C  NUMBER OF SPECTATORS OF REMAINING NUCLEUS IS NREST
       IREST = ITYPE
       INEW   = 0
@@ -516,7 +512,8 @@ C  ELIMINATE BACKWARD GOING PARTICLES
 C  ORDINARY SECONDARY PARTICLES
           SECPAR(1) = PPTL(4,I)/PAMA(KODCRS)
 C  LOOK FOR SPECTATOR NUCLEONS
-          IF ( spec_judge(I) .eq. 1 ) THEN
+          IF ( NFRAGM .NE. 0 .and. 
+     &     spec_judge(I) .eq. 1 .and. nspec .ne. 0 ) THEN
 
 C  COMPOSE PROJECTILE SPECTATORS TO REMAINING NUCLEUS
                 nspec=nspec-1

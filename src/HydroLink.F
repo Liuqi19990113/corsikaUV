@@ -20,7 +20,7 @@ C-----------------------------------------------------------------------
 #define __TSTINTINC__
 #endif
 #include "corsika.h"
-      double precision mass0,ELABN
+      double precision m_pro,ELABN
       integer NPROT,NNEUT
       integer mmry,mxptl
       parameter (mmry=1)
@@ -46,14 +46,14 @@ c     judge if the particle is the particle hydro support
       endif
 
       if(itype<200) then
-        mass0=PAMA(itype)
-        ELABN=mass0*curpar(1)
+        m_pro=PAMA(itype)
+        ELABN=m_pro*curpar(1)
       else 
         NPROT = MOD(ITYPE,100)
         NNEUT = ITYPE/100 - NPROT
-        mass0 = PAMA(14)*NPROT + PAMA(13)*NNEUT
-        !ELABN=mass0*curpar(1)/(NPROT+NNEUT)?
-        ELABN=mass0*curpar(1)
+        m_pro = PAMA(14)*NPROT + PAMA(13)*NNEUT
+        !ELABN=m_pro*curpar(1)/(NPROT+NNEUT)?
+        ELABN=m_pro*curpar(1)
       endif
 c     judge if it reach LHC energy 
       if(ELABN < 1e7) then
@@ -61,12 +61,11 @@ c     judge if it reach LHC energy
         RETURN
       endif
 
-      write(*,*)"HydroLink: itype=",itype," tar=",tar
+      IF(DEBUG) write(*,*)"HydroLink: itype=",itype," tar=",tar
       
-      CALL hydro_run(int(itype),int(tar),curpar(1),mass0,curpar(2),
-     & curpar(3),curpar(4),nptl,nspec,idptl,pptl,spec_judge)
+      CALL hydro_run(int(itype),int(tar),curpar(1),m_pro
+     & ,nptl,nspec,idptl,pptl,spec_judge)
 
-      write(*,*)"finish hydro_run"
 
       
       ! test process
@@ -75,14 +74,14 @@ c     judge if it reach LHC energy
           p_sum(j)=pptl(j,i)+p_sum(j)
         enddo
       enddo
-      write(*,*)" ELABN=",ELABN
-      write(*,*)nptl,nspec
-      write(*,*)" cms",sqrt(p_sum(4)**2-p_sum(3)**2-
-     & p_sum(2)**2-p_sum(1)**2)
+      IF(DEBUG) then
+        write(*,*)"HydroLink: ELABN Eptl ELABN/Eptl : ",ELABN,p_sum(4),
+     &  ELABN/p_sum(4)
+        write(*,*)"HydroLink: nptl npsec : ",nptl,nspec
+      ENDIF
 
       CALL HydroStore(ELABN)
   
-      write(*,*)"finish hydrostore"
 
       RETURN
       END SUBROUTINE HydroLink
