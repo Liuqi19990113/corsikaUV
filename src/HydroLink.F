@@ -38,6 +38,9 @@ C-----------------------------------------------------------------------
       nspec=0
       NPROT=0
       NNEUT=0
+      do i=1,4
+        p_sum(i)=0
+      enddo
 c     judge if the particle is the particle hydro support  
       if(.not.(itype >= 200 .or. (itype>=7 .and. itype<=9) .or. 
      & (itype>=13 .and. itype<=15))) then
@@ -61,31 +64,28 @@ c     judge if it reach LHC energy
         RETURN
       endif
 
+      IF(DEBUG) write(*,*)"HydroLink: itype=",itype," tar=",tar
       
       CALL hydro_run(int(itype),int(tar),curpar(1),m_pro
      & ,nptl,nspec,idptl,pptl,spec_judge)
-     
-     
+
+
+      
       CALL HydroStore(ELABN)
-     
-     ! test process
-      do i=1,4
-        p_sum(i)=0
-      enddo
+      ! test process
       do i=1,nptl
-      do j=1,4
-        p_sum(j)=pptl(j,i)+p_sum(j)
-        pptl(j,i)=0
+        do j=1,4
+          p_sum(j)=pptl(j,i)+p_sum(j)
+          pptl(j,i)=0
+        enddo
       enddo
-      enddo
-      IF(DEBUG) write(*,*)"HydroLink: itype=",itype," tar=",tar
       IF(DEBUG) then
         write(*,*)"HydroLink: ELABN Eptl ELABN/Eptl : ",ELABN,p_sum(4),
-      &  ELABN/p_sum(4)
-      write(*,*)"HydroLink: nptl npsec : ",nptl,nspec
+     &  ELABN/p_sum(4)
+        write(*,*)"HydroLink: nptl npsec : ",nptl,nspec
       ENDIF
-
-
+      nptl=0
+      nspec=0
   
       
       RETURN

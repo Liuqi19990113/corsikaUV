@@ -499,7 +499,8 @@ C  PROJECTILE FRAGMENT NUCLEUS
         !   KODCRS = IDRES(J) * 100 + IDXRES(J)
 
         ELSE
-          WRITE(MONIOU,*) 'HydroStore: UNKNOWN PARTICLE CODE=',KODNEX
+          ! WRITE(MONIOU,*) 'HydroStore: UNKNOWN PARTICLE CODE=',KODNEX
+          GOTO 5
           STOP
         ENDIF          
         SECPAR(0) = KODCRS
