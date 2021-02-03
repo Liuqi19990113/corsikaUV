@@ -20,14 +20,18 @@ extern "C"{
 }
 
 void LorentzTransform(const double beta[4],double p[4]){
-  double beta2=beta[0]*beta[0]+beta[1]*beta[1]+beta[2]*beta[2];
-  double beta_p=beta[0]*p[0]+beta[1]*p[1]+beta[2]*p[2];
-  double C=(beta[3]-1)/beta2;
-  double E=p[3]*beta[3]-beta[3]*beta_p;
-  double px=-beta[3]*beta[0]*p[3]+p[0]+C*beta[0]*beta_p;
-  double py=-beta[3]*beta[1]*p[3]+p[1]+C*beta[1]*beta_p;
-  double pz=-beta[3]*beta[2]*p[3]+p[2]+C*beta[2]*beta_p;
-  p[3]=E,p[0]=px,p[1]=py,p[2]=pz;
+  // double beta2=beta[0]*beta[0]+beta[1]*beta[1]+beta[2]*beta[2];
+  // double beta_p=beta[0]*p[0]+beta[1]*p[1]+beta[2]*p[2];
+  // double C=(beta[3]-1)/beta2;
+  // double E=p[3]*beta[3]-beta[3]*beta_p;
+  // double px=-beta[3]*beta[0]*p[3]+p[0]+C*beta[0]*beta_p;
+  // double py=-beta[3]*beta[1]*p[3]+p[1]+C*beta[1]*beta_p;
+  // double pz=-beta[3]*beta[2]*p[3]+p[2]+C*beta[2]*beta_p;
+  // p[3]=E,p[0]=px,p[1]=py,p[2]=pz;
+  double E=0,pz=0;
+  pz=beta[3]*(p[2]-beta[2]*p[3]);
+  E=beta[3]*(p[3]-beta[2]*p[2]);
+  p[2]=pz;p[3]=E;
 }
 
 
@@ -132,6 +136,22 @@ void hydro_run_(const int&proj_id,const int&tar,const double&gamma,const double&
   //set beta to transform from cms to lab
   beta[2]=-beta0;
   ReadHydro(beta,nptl,nspec,idptl,pptl,spec_judge);
+  // double E1=0,E0=0;
+  // double E=0;
+  // for(int i=0;i<nptl;i++){
+  //   E+=pptl[i][3];
+  //   if(spec_judge[i]==1){
+  //     E0+=pptl[i][3];
+  //     if(idptl[i]==2212){
+  //       E1+=m_p*gamma;
+  //     }
+  //     else{
+  //       E1+=m_n*gamma;
+  //     }
+  //   }
+  // }
+  // cout<<"mass error "<<(E1-E0)/(gamma*m_pro)<<' '<<(E1-E0)/E1<<endl;
+  // cout<<"energy fraction "<<E/(gamma*m_pro)<<' '<<(E-E0+E1)/(gamma*m_pro)<<endl;
   return;
 }
 
@@ -186,14 +206,15 @@ void ReadHydro(const double beta[4],int&nptl,int&nspec,int idptl[],double pptl[]
       //if use QGP, only spectator,if not use QGP, all particle
       p_spec+=p[2];
       E_spec+=p[3];
-      if(x[3]==0||!QGP_judge){
+      //eliminate p_z<0 spectator
+      if((x[3]==0&&p[2]>0)||!QGP_judge){
         idptl[nptl]=pdg;
         spec_judge[nptl]=0;
         for(int i=0;i<4;i++){
           pptl[nptl][i]=p[i];
         }
         pptl[nptl][4]=mass;
-        if(x[3]==0){
+        if(x[3]==0&&p[2]>0){
           nspec++;
           spec_judge[nptl]=1;
         }
@@ -206,6 +227,7 @@ void ReadHydro(const double beta[4],int&nptl,int&nspec,int idptl[],double pptl[]
     beta_spec[3]=1/sqrt(1-beta_spec[2]*beta_spec[2]);
 
     for(int i=0;i<nptl;i++){
+      double p[4]={0};
       LorentzTransform(beta_spec,pptl[i]);
       LorentzTransform(beta,pptl[i]);
     }
@@ -257,7 +279,6 @@ void ReadHydro(const double beta[4],int&nptl,int&nspec,int idptl[],double pptl[]
     double beta_QGP[4]={0,0,0,0};
     beta_QGP[2]=p_QGP/E_QGP;
     beta_QGP[3]=1/sqrt(1-beta_QGP[2]*beta_QGP[2]);
-
     for(int i=nspec;i<nptl;i++){
       // to cms system
       LorentzTransform(beta_QGP,pptl[i]);
@@ -268,12 +289,12 @@ void ReadHydro(const double beta[4],int&nptl,int&nspec,int idptl[],double pptl[]
 
 
 
-  if(QGP_judge){
-    cout<<"have QGP\n";
-  }
-  else
-  {
-    cout<<"only urqmd\n";
-  }
+  // if(QGP_judge){
+  //   cout<<"have QGP\n";
+  // }
+  // else
+  // {
+  //   cout<<"only urqmd\n";
+  // }
   
 }

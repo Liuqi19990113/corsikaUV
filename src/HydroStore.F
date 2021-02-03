@@ -3,7 +3,7 @@
 C-----------------------------------------------------------------------
 C
 C  STORES hydro OUTPUT PARTICLES INTO CORSIKA STACK.
-C  THIS SUBROUTINE IS CALLED FROM NEXLNK.
+C  THIS SUBROUTINE IS CALLED FROM HydroLink.
 C  ARGUMENT:
 C   ELABN  = ENERGY/NUCLEON OF PROJECTILE (GEV)
 C-----------------------------------------------------------------------
@@ -513,7 +513,7 @@ C  ORDINARY SECONDARY PARTICLES
           SECPAR(1) = PPTL(4,I)/PAMA(KODCRS)
 C  LOOK FOR SPECTATOR NUCLEONS
           IF ( NFRAGM .NE. 0 .and. 
-     &     spec_judge(I) .eq. 1 .and. nspec .ne. 0 ) THEN
+     &     spec_judge(I) .eq. 1 .and. nspec .gt. 0 ) THEN
 
 C  COMPOSE PROJECTILE SPECTATORS TO REMAINING NUCLEUS
                 nspec=nspec-1

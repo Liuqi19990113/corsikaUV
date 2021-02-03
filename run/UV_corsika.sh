@@ -8,10 +8,10 @@ rm ./UV_corsika/DAT*
 rm ./UV_corsika/result.txt
 ./CORSIKA <<EOF >./UV_corsika/result.txt
 RUNNR   $i                             run number                                
-NSHOW   1                             number of showers to generate
-PRMPAR  5626                            prim. particle (1=gamma, 14=proton, ...)
+NSHOW   4                             number of showers to generate
+PRMPAR  1608                            prim. particle (1=gamma, 14=proton, ...)
 ESLOPE  -2.71                         slope of primary energy spectrum
-ERANGE  1.01E6  1.01E6                    energy range of primary particle (GeV)
+ERANGE  3.01E10  3.01E10                    energy range of primary particle (GeV)
 THETAP  0.  0.                        range of zenith angle (degree)
 PHIP    0.  0.                   range of azimuth angle (degree)
 SEED    $seed1   0   0                     seed for 1. random number sequence
@@ -20,7 +20,7 @@ SEED    $seed3   0   0                     seed for 3. random number sequence
 OBSLEV  4424.E2                            observation level (in cm)
 MAGNET  34.618  36.13                 magnetic field centr. Europe
 HADFLG  0  0  0  0  0  2              flags hadr.interact.&fragmentation
-ECUTS   300  300  300  300          energy cuts for particles
+ECUTS   9E6  9E6  9E6  9E6          energy cuts for particles
 MUADDI  T                             additional info for muons
 MUMULT  T                             muon multiple scattering angle
 ELMFLG  T   F                         em. interaction flags (NKG,EGS)

@@ -50,15 +50,15 @@ result_file=result_path+"/event"
 def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2):
   seed=random.randint(0,2**15-1)
   output=open(urqmd_para_1,'w')
-  A=3
+  A=2
   R_pro=0
   #it is nucleus
   if(nucleus_judge==1):
     output.write("pro {} {}\n".format(pro_para_1,pro_para_2))
-    R_pro=A*pro_para_1**(1/3)
+    R_pro=A*(pro_para_1+tar_para_1)**(1/3)
   else:
     output.write("PRO {} {}\n".format(pro_para_1,pro_para_2))
-    R_pro=A
+    R_pro=A*(1+tar_para_1)**(1/3)
   output.write("tar {} {}\n".format(tar_para_1,tar_para_2))
 
   R_tar=A*(tar_para_1**(1/3))
@@ -80,10 +80,10 @@ def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para
   #it is nucleus
   if(nucleus_judge==1):
     output.write("pro {} {}\n".format(pro_para_1,pro_para_2))
-    R_pro=A*pro_para_1**(1/3)
+    R_pro=A*(pro_para_1+tar_para_1)**(1/3)
   else:
     output.write("PRO {} {}\n".format(pro_para_1,pro_para_2))
-    R_pro=A
+    R_pro=A*(1+tar_para_1)**(1/3)
   output.write("tar {} {}\n".format(tar_para_1,tar_para_2))
 
   R_tar=A*(tar_para_1**(1/3))
