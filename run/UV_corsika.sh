@@ -8,8 +8,8 @@ rm ./UV_corsika/DAT*
 rm ./UV_corsika/result.txt
 ./CORSIKA <<EOF >./UV_corsika/result.txt
 RUNNR   $i                             run number                                
-NSHOW   4                             number of showers to generate
-PRMPAR  1608                            prim. particle (1=gamma, 14=proton, ...)
+NSHOW   10                             number of showers to generate
+PRMPAR  5626                            prim. particle (1=gamma, 14=proton, ...)
 ESLOPE  -2.71                         slope of primary energy spectrum
 ERANGE  3.01E10  3.01E10                    energy range of primary particle (GeV)
 THETAP  0.  0.                        range of zenith angle (degree)
