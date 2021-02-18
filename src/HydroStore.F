@@ -1,3 +1,6 @@
+#ifndef _HYDROSTORE_H_
+#define _HYDROSTORE_H_
+
       SUBROUTINE HydroStore( ELABN )
 
 C-----------------------------------------------------------------------
@@ -1044,5 +1047,7 @@ C  NUMBER OF BILLIONS
 
       RETURN
       END SUBROUTINE HydroStore
+
+#endif
 
 

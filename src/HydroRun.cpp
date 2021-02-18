@@ -85,7 +85,7 @@ void hydro_run_(const int&proj_id,const int&tar,const double&gamma,const double&
       pro_iso3=2;
     }
     else if(proj_id==9){
-      //pi0
+      //pi-
       pro_pid=101;
       pro_iso3=-2;
     }
@@ -190,8 +190,8 @@ void ReadHydro(const double beta[4],int&nptl,int&nspec,int idptl[],double pptl[]
       input_line.clear();
       input_line.str(data_line);
       double p[4]={0,0,0,0};
-      double pdg=0;
-      double counter=0;
+      int pdg=0;
+      int counter=0;
       double mass=0;
       //frezout position
       double x[4]={0,0,0,0};
@@ -214,14 +214,20 @@ void ReadHydro(const double beta[4],int&nptl,int&nspec,int idptl[],double pptl[]
           pptl[nptl][i]=p[i];
         }
         pptl[nptl][4]=mass;
-        if(x[3]==0&&p[2]>0){
-          nspec++;
-          spec_judge[nptl]=1;
+        if(x[3]==0){
+          //eliminate backwark spectator
+          if(p[2]>0){
+            nspec++;
+            spec_judge[nptl]=1;
+          }
+          else{
+            nptl--;
+          }
         }
         nptl++;
       }
     }
-
+    input_spec.close();
     double beta_spec[4]={0,0,0,0};
     beta_spec[2]=p_spec/E_spec;
     beta_spec[3]=1/sqrt(1-beta_spec[2]*beta_spec[2]);
@@ -232,7 +238,7 @@ void ReadHydro(const double beta[4],int&nptl,int&nspec,int idptl[],double pptl[]
       LorentzTransform(beta,pptl[i]);
     }
   }
-  input_spec.close();
+  
 
   //begin QGP
 
@@ -251,8 +257,8 @@ void ReadHydro(const double beta[4],int&nptl,int&nspec,int idptl[],double pptl[]
       input_line.clear();
       input_line.str(data_line);
       double p[4]={0};
-      double pdg=0;
-      double counter=0;
+      int pdg=0;
+      int counter=0;
       double mass=0;
       //frezout position
       double x[4]={0};
@@ -265,10 +271,10 @@ void ReadHydro(const double beta[4],int&nptl,int&nspec,int idptl[],double pptl[]
       input_line>>mass;
       idptl[nptl]=pdg;
       // LorentzTransform(beta,p);
+      p_QGP+=p[2];
+      E_QGP+=p[3];
       for(int i=0;i<4;i++){
         pptl[nptl][i]=p[i];
-        p_QGP+=p[2];
-        E_QGP+=p[3];
       }
       pptl[nptl][4]=mass;
       spec_judge[nptl]=0;

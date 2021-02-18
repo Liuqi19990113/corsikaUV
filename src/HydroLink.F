@@ -1,3 +1,6 @@
+#ifndef _HYDROLINK_F_
+#define _HYDROLINK_F_
+
       SUBROUTINE HydroLink
 
 C-----------------------------------------------------------------------
@@ -25,7 +28,7 @@ C-----------------------------------------------------------------------
       integer mmry,mxptl
       parameter (mmry=1)
       parameter (mxptl=200000/mmry)
-      integer nptl,nspec,idptl,spec_judge
+      integer nptl,nspec,idptl,spec_judge,seedh
       double precision pptl,tivptl,xorptl
       common/Hydro/NPROT,NNEUT,nptl,nspec,pptl(5,mxptl),idptl(mxptl),
      & spec_judge(mxptl)
@@ -65,9 +68,16 @@ c     judge if it reach LHC energy
       endif
 
       IF(DEBUG) write(*,*)"HydroLink: itype=",itype," tar=",tar
+
+      ! generate random seed
+
+      CALL RMMARD( RD,1,1 )
+      seedh=NINT(RD(1)*1000000)
+
+      IF(DEBUG) write(*,*)"HydroLink: seedh=",seedh
       
-      CALL hydro_run(int(itype),int(tar),curpar(1),m_pro
-     & ,nptl,nspec,idptl,pptl,spec_judge)
+      CALL HydroRun(int(itype),int(tar),curpar(1),m_pro
+     & ,nptl,nspec,idptl,pptl,spec_judge,seedh)
 
 
       
@@ -90,3 +100,5 @@ c     judge if it reach LHC energy
       
       RETURN
       END SUBROUTINE HydroLink
+
+#endif

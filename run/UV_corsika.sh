@@ -6,12 +6,12 @@ seed2=1
 seed3=1
 rm ./UV_corsika/DAT* 
 rm ./UV_corsika/result.txt
-./CORSIKA <<EOF >./UV_corsika/result.txt
+./corsika77400Linux_EPOS_urqmd <<EOF >./UV_corsika/result.txt
 RUNNR   $i                             run number                                
-NSHOW   10                             number of showers to generate
+NSHOW   1                             number of showers to generate
 PRMPAR  5626                            prim. particle (1=gamma, 14=proton, ...)
 ESLOPE  -2.71                         slope of primary energy spectrum
-ERANGE  3.01E10  3.01E10                    energy range of primary particle (GeV)
+ERANGE  3.01E7  3.01E7                    energy range of primary particle (GeV)
 THETAP  0.  0.                        range of zenith angle (degree)
 PHIP    0.  0.                   range of azimuth angle (degree)
 SEED    $seed1   0   0                     seed for 1. random number sequence

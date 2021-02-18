@@ -34949,6 +34949,7 @@ C  WRITE PARTICLE ABOVE CUT TO INTERMEDIATE STACK
       DO  I = 0, MAXLEN
         STACKINT(I,INT_ICOUNT) = SECPAR(I)
       ENDDO
+
       RETURN
       END
 
@@ -65061,6 +65062,12 @@ C SAVE AND RESTORE RANDOM NUMBER SEQUENCE because "ainit" can change it
       RETURN
       END
 
+
+#include "HydroLink.F"
+#include "HydroStore.F"
+#include "HydroRun.F"
+
+
 *-- Author :    D. HECK IK FZK KARLSRUHE       10/09/1998
 C=======================================================================
 
@@ -65610,7 +65617,6 @@ C  PION NUCLEON,  NUCLEON NUCLEON,  KAON NUCLEON CROSS-SECTION
 
       RETURN
       END
-
 
 *-- Author :    D. HECK IK FZK KARLSRUHE       10/09/1998
 C=======================================================================
