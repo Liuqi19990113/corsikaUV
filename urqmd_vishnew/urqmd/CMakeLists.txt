@@ -3,6 +3,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 # By default, optimize for the system's native architecture.  Disable via the
 # NATIVE option.  In addition, detect if another architecture flag is already
 # set and do not override it.
+set(CMAKE_Fortran_FLAGS "-mcmodel=medium")
 option(NATIVE "compile for native architecture" ON)
 if(NATIVE)
   if(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
