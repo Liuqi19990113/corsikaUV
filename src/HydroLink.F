@@ -80,7 +80,6 @@ c     judge if it reach LHC energy
      & ,nptl,nspec,idptl,pptl,spec_judge,seedh)
 
 
-      
       CALL HydroStore(ELABN)
       ! test process
       do i=1,nptl

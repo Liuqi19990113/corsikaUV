@@ -47,8 +47,8 @@ result_path=root_path+"/result"
 result_file=result_path+"/event"
   
 
-def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2):
-  seed=random.randint(1,10000000)
+def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,urqmd_seed):
+  print(" run.py : urqmd seed {}".format(urqmd_seed))
   output=open(urqmd_para_1,'w')
   A=2
   R_pro=0
@@ -64,7 +64,7 @@ def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para
   R_tar=A*(tar_para_1**(1/3))
   R=R_pro+R_tar
   output.write("IMP 0. {}\n".format(R))
-  output.write("rsd {}\n".format(seed))
+  output.write("rsd {}\n".format(urqmd_seed))
   output.write("ene {}\n".format(ene))
   output.write("nev 1\n")
   output.write("tim 4 0.1\n")
@@ -89,7 +89,7 @@ def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para
   R_tar=A*(tar_para_1**(1/3))
   R=R_pro+R_tar
   output.write("IMP 0. {}\n".format(R))
-  output.write("rsd {}\n".format(seed))
+  output.write("rsd {}\n".format(urqmd_seed))
   output.write("ene {}\n".format(ene))
   output.write("nev 1\n")
   output.write("tim 8000 8000\n")
@@ -99,8 +99,8 @@ def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para
   output.close()
 
 
-def run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2):
-  write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
+def run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,seedh):
+  write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,seedh)
   if(os.path.exists(transform_input)):
     os.remove(transform_input)
   if(os.path.exists(urqmd_QGP)):
@@ -111,7 +111,7 @@ def run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_par
   os.popen(urqmd_initial_exec).read()
   QGP_judge=int(os.popen(QGP_judge_exec).read())
   if(QGP_judge==-1):
-    return run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
+    return run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,seedh+1)
   elif(QGP_judge==1):
     shutil.move(urqmd_initial_result14,transform_input)
   return QGP_judge
@@ -170,7 +170,7 @@ tar_para_2=int(sys.argv[6])
 seedh=int(sys.argv[7])
 random.seed(seedh)
 
-QGP_judge=run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
+QGP_judge=run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,seedh)
 if(QGP_judge==1):
   run_transform()
   run_vishnew()

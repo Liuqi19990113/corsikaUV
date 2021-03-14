@@ -169,7 +169,6 @@
                 nspec=nspec+1
                 spec_judge(nptl)=1
               else
-                write(*,*)p,pdg
                 nptl=nptl-1
               endif
             endif
