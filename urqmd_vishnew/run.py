@@ -61,7 +61,7 @@ def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para
     R_pro=A*(1+tar_para_1)**(1/3)
   output.write("tar {} {}\n".format(tar_para_1,tar_para_2))
 
-  R_tar=A*(tar_para_1**(1/3))
+  R_tar=A*(tar_para_1**(1./3))
   R=R_pro+R_tar
   output.write("IMP 0. {}\n".format(R))
   output.write("rsd {}\n".format(urqmd_seed))
@@ -75,19 +75,6 @@ def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para
   output.close()
 
   output=open(urqmd_para_2,'w')
-  A=3
-  R_pro=0
-  #it is nucleus
-  if(nucleus_judge==1):
-    output.write("pro {} {}\n".format(pro_para_1,pro_para_2))
-    R_pro=A*(pro_para_1+tar_para_1)**(1/3)
-  else:
-    output.write("PRO {} {}\n".format(pro_para_1,pro_para_2))
-    R_pro=A*(1+tar_para_1)**(1/3)
-  output.write("tar {} {}\n".format(tar_para_1,tar_para_2))
-
-  R_tar=A*(tar_para_1**(1/3))
-  R=R_pro+R_tar
   output.write("IMP 0. {}\n".format(R))
   output.write("rsd {}\n".format(urqmd_seed))
   output.write("ene {}\n".format(ene))
@@ -169,6 +156,7 @@ tar_para_1=int(sys.argv[5])
 tar_para_2=int(sys.argv[6])
 seedh=int(sys.argv[7])
 random.seed(seedh)
+print("HydroRun : python run.py {} {} {} {} {} {} {}".format(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,seedh))
 
 QGP_judge=run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,seedh)
 if(QGP_judge==1):
