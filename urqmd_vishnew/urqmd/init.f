@@ -34,7 +34,7 @@ c read input file
 
       firstseed=.true.
       fixedseed=ranseed.gt.0
-      if(fixedseed)write(6,*)'fixed random number:',ranseed
+      ! if(fixedseed)write(6,*)'fixed random number:',ranseed
       call sseed(ranseed)
       call loginit
       if(CTOption(33).eq.0.or.CTOption(9).eq.0) call loadwtab(io)
