@@ -42,6 +42,27 @@ namespace Transform{
   void search_spectator(std::vector<Particle>&secondaries,const std::string&output_path=Ex_output_path);
   /**search the energy at t0*/
   double search_energy(const std::string &input_file=Ex_input_file);
+  /**remove all particles over eta_cut
+   * @para[in] secondaries: the vector to store all secondaries and will be remove all secondaries over eta_cut
+   * @para[in] secondaries_cut: the vector to store all secondaries out of eta_cut
+   * @para[in] eta_cut: LB[0]<RB[1]
+   * @return the energy within eta_cut
+  */
+  double remove_eta_cut(std::vector<Particle>&secondaries,std::vector<Particle>&secondaries_cut,const double* eta_cut=Ex_eta_cut); 
+  /**combine particle vector to oscar1997A format
+   * @note the output particle are all on tau_0 surface
+  */
+  void OSCAR_19(const std::vector<Particle>&secondaries,const std::string filename=Ex_output_path+"eta_cut19.txt");
+  /**combine particle vector to urqmd ftn14 format
+   * @note the output particle are freestreaming to t=0
+  */
+  void urqmd_14(const std::vector<Particle>&secondaries,const std::string filename=Ex_output_path+"eta_cut14.txt");
+  /**get the sum of momentum in the vector
+   * @para[in] secondaries: the sum vector
+   * @para[in] mu: the momentum component, 0~3
+  */
+  double momentum_sum(const std::vector<Particle>&secondaries,int mu);
+  
 }
 
 #endif

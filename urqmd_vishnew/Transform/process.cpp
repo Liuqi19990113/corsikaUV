@@ -84,20 +84,20 @@ namespace Transform{
         getline(input,data_line);
         input_line.str(data_line);
         double x[4],p[4],mass;
-        int itype;
+        int itype,iso3,charge,parent,N_coll,parent_type;
         for(unsigned j=0;j<4;j++)input_line>>x[j];
         for(unsigned j=0;j<4;j++)input_line>>p[j];
-        input_line>>mass>>itype;
+        input_line>>mass>>itype>>iso3>>charge>>parent>>N_coll>>parent_type;
         // LorentzTransform(beta,p);
         // LorentzTransform(beta,x);
         for(int k=0;k<4;k++){
           p_sum[k]+=p[k];
         }
         //judge and push the particle on the surface,if the last time, let it all freestreaming
-        Particle this_particle(p,x,mass,itype);
+        Particle this_particle(p,x,mass,itype,iso3,charge,parent,N_coll,parent_type);
         double delta_t=-1;
         if(std::abs(this_particle.space().Minkow()[0]-Ex_M_up[0])<0.01*Ex_Dx[0]){
-          delta_t=cross_surface(this_particle,10000*Ex_M_up[0]);
+          delta_t=cross_surface(this_particle,-1);
         }
         else{
           delta_t=cross_surface(this_particle);
@@ -110,11 +110,11 @@ namespace Transform{
     for(int i=0;i<4;i++){
       p_sum[i]/=time_step;
     }
-    std::cout<<time_step<<std::endl;
-    for(int i=0;i<4;i++){
-      std::cout<<p_sum[i]<<' ';
-    }
-    std::cout<<std::endl;
+    // std::cout<<time_step<<std::endl;
+    // for(int i=0;i<4;i++){
+    //   std::cout<<p_sum[i]<<' ';
+    // }
+    // std::cout<<std::endl;
     input.close();
     return secondaries_num;
   }
@@ -158,7 +158,7 @@ namespace Transform{
     while(true){
       if(i>=secondaries.size())break;
       //proton and neutron at high energy levels will also be treat as spectator
-      if(secondaries[i].type()>=1&&secondaries[i].type()<=16){
+      if(secondaries[i].GetType()>=1&&secondaries[i].GetType()<=16){
         // if p_z/E>fraction, then treat the particle as spectator
         if(std::abs(secondaries[i].momentum().Minkow()[3]/secondaries[i].momentum().Minkow()[0])>=fraction){
           // for(unsigned j=0;j<4;j++){
@@ -219,6 +219,119 @@ namespace Transform{
     input.close();
     return energy;
 
+  }
+
+  double remove_eta_cut(std::vector<Particle>&secondaries,std::vector<Particle>&secondaries_cut,const double* eta_cut){
+    //energy within eta_cut
+    double energy=0;
+    double secondaries_num_sum=secondaries.size();
+    auto ii=secondaries.begin();
+    while(ii!=secondaries.end()){
+      double eta=ii->space().Milne()[3];
+      if(eta<eta_cut[0]||eta>eta_cut[1]){
+        secondaries_cut.push_back(*ii);
+        secondaries.erase(ii);
+      }
+      else{
+        ii++;
+        energy+=ii->momentum().Minkow()[0];
+      }
+    }
+    if(secondaries_num_sum!=(secondaries.size()+secondaries_cut.size())){
+      std::cerr<<"eta cut is wrong"<<std::endl;
+      exit(-1);
+    }
+    if(Ex_DEBUG){
+      std::cout<<"secondaries within eta cut "<<secondaries.size()<<std::endl;
+      std::cout<<"secondaries over eta cut "<<secondaries_cut.size()<<std::endl;
+      std::cout<<"energy within eta cut "<<energy<<std::endl;
+    }
+    return energy;
+  }
+
+  void OSCAR_19(const std::vector<Particle>&secondaries,const std::string filename){
+    using std::ios;
+    using std::setw;
+    using std::fixed;
+    using std::setprecision;
+    std::ofstream output(filename.c_str());
+    if(!output){
+      std::cerr<<"can't open "<<filename<<std::endl;
+      exit(-1);
+    }
+    output<<"OSC1997A\n";
+    output<<"final_id_p_x\n";
+    output<<"   UrQMD  3.4       (  2,     1)+( 40,    18)  eqsp  0.1000E+10         1\n";
+    //event header
+    output.setf(ios::right);
+    output.fill(' ');
+    output.setf(ios::showpoint);
+    output.flags(ios::fixed);
+    output.flags(ios::scientific);
+    output<<setw(10)<<1<<"  "<<setw(10)<<"  "<<secondaries.size()<<"  "<<setw(8)<<setprecision(3)<<0<<"  "<<0;
+
+    //loop over particles
+    for(int i=0;i<secondaries.size();i++){
+      output<<setw(10)<<i+1<<"  ";
+      output<<setw(10)<<secondaries[i].GetPdg()<<"  ";
+      output<<setw(12)<<setprecision(6)<<secondaries[i].momentum().Minkow()[1]<<"  "<<secondaries[i].momentum().Minkow()[2]<<"  "<<secondaries[i].momentum().Minkow()[3]<<"  "<<secondaries[i].momentum().Minkow()[0]<<"  "<<secondaries[i].GetMass()<<"  "<<secondaries[i].space().Minkow()[1]<<"  "<<secondaries[i].space().Minkow()[2]<<"  "<<secondaries[i].space().Minkow()[3]<<"  "<<secondaries[i].space().Minkow()[0]<<"  \n";
+    }
+    output.close();
+
+  }
+
+  void urqmd_14(const std::vector<Particle>&secondaries,const std::string filename){
+    using std::ios;
+    using std::setw;
+    using std::fixed;
+    using std::setprecision;
+    std::ofstream output(filename.c_str());
+    output.setf(ios::right);
+    output.fill(' ');
+    output.setf(ios::showpoint);
+    output.flags(ios::fixed);
+    output.flags(ios::scientific);
+    if(!output){
+      std::cerr<<"can't open "<<filename<<std::endl;
+      exit(-1);
+    }
+    std::ifstream header("urqmd_result14");
+    while(true){
+      std::string line;
+      getline(header,line);
+      output<<line<<std::endl;
+      if(line.find("pvec")!=line.npos){
+        break;
+      }
+    }
+    header.close();
+    output<<setw(12)<<secondaries.size()<<" 0"<<std::endl;
+    for(int i=0;i<8;i++){
+      output<<setw(8)<<0;
+    }
+    output<<std::endl;
+    for(int i=0;i<secondaries.size();i++){
+      Particle the(freestreaming(secondaries[i],-secondaries[i].space().Minkow()[0]));
+      for(int j=0;j<4;j++){
+        output<<" "<<setw(16)<<setprecision(8)<<the.space().Minkow()[j];
+      }
+      for(int j=0;j<4;j++){
+        output<<" "<<setw(16)<<setprecision(8)<<the.momentum().Minkow()[j];
+      }
+      output<<" "<<setw(16)<<setprecision(8)<<the.GetMass();
+      output<<setw(11)<<the.GetType();
+      output<<setw(3)<<the.GetIso3()<<setw(3)<<the.GetCharge();
+      output<<setw(9)<<the.GetParent()<<setw(5)<<the.GetN_coll()<<setw(4)<<the.GetParent_type()<<std::endl;
+    }
+    output.close();
+  }
+
+  double momentum_sum(const std::vector<Particle>&secondaries,int mu){
+    double energy=0;
+    for(int i=0;i<secondaries.size();i++){
+      energy+=secondaries[i].momentum().Minkow()[mu];
+    }
+    return energy;
   }
 
 
