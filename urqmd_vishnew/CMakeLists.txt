@@ -1,6 +1,6 @@
 ADD_EXECUTABLE(QGP_judge QGP_judge.cpp)
 INSTALL(TARGETS QGP_judge DESTINATION urqmd_vishnew/urqmd)
-INSTALL(PROGRAMS run.py DESTINATION urqmd_vishnew)
+INSTALL(PROGRAMS run.py para.py exec_path.py DESTINATION urqmd_vishnew)
 ADD_SUBDIRECTORY(Transform)
 ADD_SUBDIRECTORY(urqmd)
 ADD_SUBDIRECTORY(VISHNew)
