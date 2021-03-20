@@ -742,44 +742,44 @@ c stb: keep particle stable
 c cto: collision term options
       elseif(flag.eq.'cto') then
          read(inputstr,fmt=*,err=88,end=88) index,ival
-         write(6,'(a9,i3,a2,x,i3," is changed to ",x,i3," (",a60,")")')
-     &        'CTOption(',index,')=',CTOption(index),ival
-     &        ,CTOStrng(index)
+   !       write(6,'(a9,i3,a2,x,i3," is changed to ",x,i3," (",a60,")")')
+   !   &        'CTOption(',index,')=',CTOption(index),ival
+   !   &        ,CTOStrng(index)
          CTOption(index)=ival
          CTOdc(index)=' *'
 c ctp: collision term parameter
       elseif(flag.eq.'ctp') then
          read(inputstr,fmt=*,err=88,end=88) index,rval
-         write(6,'(a8,i3,a2,x,e10.4,a15,x,e10.4," (",a60,")")')
-     ,           'CTParam(',index,')=',CTParam(index)," is changed to "
-     ,           ,rval,CTPStrg(index)
+   !       write(6,'(a8,i3,a2,x,e10.4,a15,x,e10.4," (",a60,")")')
+   !   ,           'CTParam(',index,')=',CTParam(index)," is changed to "
+   !   ,           ,rval,CTPStrg(index)
          CTParam(index)=rval
          CTPdc(index)=' *'
       elseif (flag.eq.'f13') then
          bf13=.true.
-         if (info) write(6,*)'(info) no output on unit 13'
+         ! if (info) write(6,*)'(info) no output on unit 13'
       elseif (flag.eq.'f14') then
          bf14=.true.
-         if (info) write(6,*)'(info) no output on unit 14'
+         ! if (info) write(6,*)'(info) no output on unit 14'
       elseif (flag.eq.'f15') then
          bf15=.true.
-         if (info) write(6,*)'(info) no output on unit 15'
+         ! if (info) write(6,*)'(info) no output on unit 15'
       elseif (flag.eq.'iou') then
          read(inputstr,fmt=*,err=88,end=88) index,ival
          call uounit(index,ival)
          write(6,*)'file',index,'will be written on unit',ival
       elseif (flag.eq.'f16') then
          bf16=.true.
-         if (info) write(6,*)'(info) no output on unit 16'
+         ! if (info) write(6,*)'(info) no output on unit 16'
       elseif (flag.eq.'f18') then
           bf18=.true.
-          if (info) write(6,*)'(info) no output on unit 18'
+         !  if (info) write(6,*)'(info) no output on unit 18'
       elseif (flag.eq.'f19') then
           bf19=.true.
-          if (info) write(6,*)'(info) no output on unit 19'
+         !  if (info) write(6,*)'(info) no output on unit 19'
       elseif (flag.eq.'f20') then
           bf20=.true.
-          if (info) write(6,*)'(info) no output on unit 20'
+         !  if (info) write(6,*)'(info) no output on unit 20'
       else
          write(6,*)'undefined opcode in input-file on line',line
          stop
@@ -853,10 +853,10 @@ c...some input combinations should be avoided and/or commented
      ,  ' should not be used for serious calculations!'
       end if
 
-      if(CTOption(18).ne.0)then
-        write(6,*)'Warning: CTOption(18)=',CToption(18),': ',
-     ,  'unstable particles will not decay after propagation.'
-      end if
+   !    if(CTOption(18).ne.0)then
+   !      write(6,*)'Warning: CTOption(18)=',CToption(18),': ',
+   !   ,  'unstable particles will not decay after propagation.'
+   !    end if
 
 
       if(CTOption(31).ne.0)then

@@ -175,8 +175,8 @@ c mix
 
 c calculate constants only once!
       if(firstlog) goto 1000
-      if (info) write(6,*) 
-     $     '(info) dsigma: calculating constants for ang. dist.'
+!       if (info) write(6,*) 
+!      $     '(info) dsigma: calculating constants for ang. dist.'
 
 c define constants for pion-Term (no s-dependence)
       m42   = 4.0d0*m*m
@@ -271,7 +271,7 @@ c define constants for mix-Term
      &      - 4.0d0*mom2*msi2)
 
       firstlog = .true.
-      if (info) write(6,*) '(info) dsigma: calculation finished'
+      ! if (info) write(6,*) '(info) dsigma: calculation finished'
 
 c s-dependence beyond this point
 

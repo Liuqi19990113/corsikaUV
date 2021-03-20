@@ -75,7 +75,7 @@ c     call auto-seed generator only for first event and if no seed was fixed
          firstseed=.false.
       endif
 
-      write(6,*)'event# ',event,ranseed
+      ! write(6,*)'event# ',event,ranseed
 
 c
 c     initialisation of physics quantities 
@@ -373,16 +373,18 @@ c final output
       
          mp=mp+npart
          if(ctag.eq.0)then
-           write(*,*)'(W) No collision in event ',event
+      !      write(*,*)'(W) No collision in event ',event
+            write(*,*)0
            noc=noc+1
          endif
 
 c     end of event loop
  10   continue
 
-      write(6,301)'no. of collisions = ',mc/dble(nevents),' (per event)'
-      write(6,301)'final particles   = ',mp/dble(nevents),' (per event)'
-      write(6,302)'empty events      : ', noc,noc*1d2/dble(nevents)
+      ! write(6,301)'no. of collisions = ',mc/dble(nevents),' (per event)'
+      ! write(6,301)'final particles   = ',mp/dble(nevents),' (per event)'
+      ! write(6,302)'empty events      : ', noc,noc*1d2/dble(nevents)
+      write(6,*)INT(mp/dble(nevents))
  301  format(a19,f8.1,a12)
  302  format(a19,i8,' = ',f5.1,'%')
       end
