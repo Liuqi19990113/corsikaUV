@@ -1,6 +1,5 @@
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/include)
 FILE(GLOB TRANSFORM_SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 ADD_EXECUTABLE(transform ${TRANSFORM_SRC} ityp2pdg.f blockres.f)
-INSTALL(TARGETS transform DESTINATION transform)
-INSTALL(FILES Transform_para.txt DESTINATION transform)
-INSTALL(DIRECTORY utillities DESTINATION transform)
+INSTALL(TARGETS transform DESTINATION urqmd_vishnew/transform)
+INSTALL(FILES Transform_para.txt DESTINATION urqmd_vishnew/transform)
