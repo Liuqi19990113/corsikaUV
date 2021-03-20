@@ -139,10 +139,11 @@ def run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_par
     os.remove(urqmd_spec)
   os.chdir(urqmd_path)
   urqmd_judge=os.popen(urqmd_initial_exec).read()
-  urqmd_judge=urqmd_judge.strip(('\n'))
-  urqmd_para=list(map(int,urqmd_judge.split('\n')))
+  urqmd_judge=urqmd_judge.replace('\n', '')
+  urqmd_judge=urqmd_judge.strip(" ")
+  urqmd_para=list(map(int,urqmd_judge.split()))
   # judge if non interact
-  if(urqmd_judge==0):
+  if(urqmd_para[0]==0):
     return run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,seedh+1)
   # use transform to judge if have QGP
   shutil.move(urqmd_initial_result14,transform_input)
