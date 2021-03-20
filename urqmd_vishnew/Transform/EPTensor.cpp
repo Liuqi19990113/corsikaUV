@@ -123,7 +123,8 @@ namespace Transform{
         std::cout<<"judge eta_cut at LB,RB="<<eta_cut[0]<<" "<<eta_cut[1]<<std::endl;
       }
     }
-    if(eta_cut[0]>eta_cut[1]){
+    //if eta=0 have QGP, then create QGP
+    if(eta_cut[0]>eta_cut[1]||(eta_cut[0]*eta_cut[1])>=0){
       return false;
     }
     else return true;

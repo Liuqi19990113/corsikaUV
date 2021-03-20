@@ -28,7 +28,7 @@ namespace Transform{
   bool Ex_DEBUG=0;
   const double Pi=3.14159265358979323846264338328;
   const double HbarC=0.19733;
-  std::string Ex_input_file="urqmd_result14";
+  std::string Ex_input_file="urqmd_initial_14.txt";
   std::string Ex_output_path=".";
   std::string Ex_parameter_file="Transform_para.txt";
 

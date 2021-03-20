@@ -50,7 +50,7 @@ result_file=result_path+"/event"
 def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,urqmd_seed):
   print(" run.py : urqmd seed {}".format(urqmd_seed))
   output=open(urqmd_para_1,'w')
-  A=2
+  A=1.6
   R_pro=0
   #it is nucleus
   if(nucleus_judge==1):
@@ -102,18 +102,30 @@ Reta 1.  //R_eta or sigma_eta
 t 0 4 20 // t_range: t_down t_up t_bin ,with bin is (2*val)+1
 x -13 13 65 // x_range: x_down x_up x_bin ,with bin is (2*val)+1
 y -13 13 65 // y_range: y_down y_up y_bin ,with bin is (2*val)+1
-eta -4 4 20 // eta_range: eta_down eta_up eta_bin ,with bin is (2*val)+1
+eta -8 8 40 // eta_range: eta_down eta_up eta_bin ,with bin is (2*val)+1
 eta_cut_mode 0 // 0: calculate eta_cut from Edec, 1: use input eta_cut
 eta_cut -0 0 // for eta_cut_mode=1,output particle over eta_cut to eta_cut19.txt and eta_cut14.txt
 Edec 0.18 // decoupling energy density GeV/fm^3, for eta_cut_mode=0
 range 3 //range of particle impact
-input urqmd_result14 //input file name
+input urqmd_initial_14.txt //input file name
 output Initial //output file dir
 K 1.5 // normalization factor of EPTensor
 VISHNEW 1 // output vishnew Initial: ed.txt u1.txt u2.txt,ed in GeV/fm^3
 MUSIC 0 // output MUSIC Initial:haven't been finished
 DEBUG 0 // if 1, output some information for debug, else clean''')
   output.close()
+
+def run_transform(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2):
+  os.chdir(transform_path)
+  write_transform_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
+  if(not os.path.exists(transform_result_dir)):
+    os.mkdir(transform_result_dir)
+  [eta_LB,eta_RB,E_core,p_core]=list(map(float,os.popen(transform_exec+' '+transform_para).read().split(' ')))
+  if(E_core>0):
+    if(os.path.exists(vishnew_input_dir)):
+      shutil.rmtree(vishnew_input_dir)
+    shutil.move(transform_result_dir,vishnew_input_dir)
+  return [eta_LB,eta_RB,E_core,p_core]
 
 
 def run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,seedh):
@@ -126,24 +138,16 @@ def run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_par
     os.remove(urqmd_spec)
   os.chdir(urqmd_path)
   os.popen(urqmd_initial_exec).read()
+  # judge if non interact
   QGP_judge=int(os.popen(QGP_judge_exec).read())
   if(QGP_judge==-1):
     return run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,seedh+1)
-  elif(QGP_judge==1):
-    shutil.move(urqmd_initial_result14,transform_input)
-  return QGP_judge
+  # use transform to judge if have QGP
+  shutil.move(urqmd_initial_result14,transform_input)
+  [eta_LB,eta_RB,E_core,p_core]=run_transform(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
+  
+  return [eta_LB,eta_RB,E_core,p_core]
 
-
-
-def run_transform(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2):
-  os.chdir(transform_path)
-  write_transform_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
-  if(not os.path.exists(transform_result_dir)):
-    os.mkdir(transform_result_dir)
-  os.popen(transform_exec+' '+transform_para).read()
-  if(os.path.exists(vishnew_input_dir)):
-    shutil.rmtree(vishnew_input_dir)
-  shutil.move(transform_result_dir,vishnew_input_dir)
 
 def run_vishnew():
   os.chdir(vishnew_path)
@@ -189,9 +193,9 @@ seedh=int(sys.argv[7])
 random.seed(seedh)
 print("HydroRun : python run.py {} {} {} {} {} {} {}".format(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,seedh))
 
-QGP_judge=run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,seedh)
-if(QGP_judge==1):
-  run_transform(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
+[eta_LB,eta_RB,E_core,p_core]=run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,seedh)
+E_0=0
+if(E_core>E_0):
   run_vishnew()
   run_iSS()
   # shutil.move(iss_result,urqmd_QGP)

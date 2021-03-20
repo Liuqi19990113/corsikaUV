@@ -30,18 +30,20 @@ int main(int argc,char *argv[]){
   for(unsigned i=0;i<secondaries.size();i++){
     energy_momentum.AddParticle(secondaries[i]);
   }
+  double eta_cut[2]={0,0};
   //remove over eta_cut
   if(Ex_eta_cut_mode==1){
     remove_eta_cut(secondaries,secondaries_cut,Ex_eta_cut);
+    eta_cut[0]=Ex_eta_cut[0];
+    eta_cut[1]=Ex_eta_cut[1];
   }
   else if(Ex_eta_cut_mode==0){
-    double eta_cut[2]={0,0};
     if(!energy_momentum.search_eta_cut(eta_cut)){
       if(Ex_DEBUG){
         std::cout<<"no QGP generated\n";
         std::cout<<"E and p_z within eta_cut :";
       }
-      std::cout<<0<<" "<<0<<std::endl;
+      cout<<"0 0 0 0";
       return 0;
     }
     remove_eta_cut(secondaries,secondaries_cut,eta_cut);
@@ -50,11 +52,16 @@ int main(int argc,char *argv[]){
   OSCAR_19(secondaries_cut);
   //combine to urqmd ftn14 format and freestreaming to t=0
   urqmd_14(secondaries_cut);
-  
+  cout<<"begin flow cal\n";
   energy_momentum.CalFlow();
+  cout<<"finish flow cal\n";
   WriteFlow2(energy_momentum);
   if(Ex_DEBUG){
     std::cout<<"E and p_z within eta_cut :";
+    std::cout<<momentum_sum(secondaries,0)<<" "<<momentum_sum(secondaries,3)<<std::endl;
   }
-  std::cout<<momentum_sum(secondaries,0)<<" "<<momentum_sum(secondaries,3)<<std::endl;
+  else{
+    //use for run.py parameter [eta_LB,eta_RB,E_core,p_core]
+    std::cout<<eta_cut[0]<<' '<<eta_cut[1]<<' '<<momentum_sum(secondaries,0)<<" "<<momentum_sum(secondaries,3);
+  }
 }
