@@ -95,8 +95,9 @@ def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para
 def write_transform_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2):
   output=open(transform_para,'w')
   # tau=sqrt(((2*ene*0.937)**2-4*0.937**2)/(40000-4*0.937**2))
-  tau=sqrt(ene*0.937/100.)
-  output.write("tau {} //tau_0".format(tau))
+  # tau=sqrt(100./ene*0.937)
+  tau=1
+  output.write("tau {} //tau_0\n".format(tau))
   output.write('''Rver 1. //R_ver or sigma_r
 Reta 1.  //R_eta or sigma_eta
 t 0 4 20 // t_range: t_down t_up t_bin ,with bin is (2*val)+1
@@ -137,10 +138,11 @@ def run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_par
   if(os.path.exists(urqmd_spec)):
     os.remove(urqmd_spec)
   os.chdir(urqmd_path)
-  os.popen(urqmd_initial_exec).read()
+  urqmd_judge=os.popen(urqmd_initial_exec).read()
+  urqmd_judge=urqmd_judge.strip(('\n'))
+  urqmd_para=list(map(int,urqmd_judge.split('\n')))
   # judge if non interact
-  QGP_judge=int(os.popen(QGP_judge_exec).read())
-  if(QGP_judge==-1):
+  if(urqmd_judge==0):
     return run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,seedh+1)
   # use transform to judge if have QGP
   shutil.move(urqmd_initial_result14,transform_input)
