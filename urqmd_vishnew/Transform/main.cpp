@@ -52,9 +52,7 @@ int main(int argc,char *argv[]){
   OSCAR_19(secondaries_cut);
   //combine to urqmd ftn14 format and freestreaming to t=0
   urqmd_14(secondaries_cut);
-  cout<<"begin flow cal\n";
   energy_momentum.CalFlow();
-  cout<<"finish flow cal\n";
   WriteFlow2(energy_momentum);
   if(Ex_DEBUG){
     std::cout<<"E and p_z within eta_cut :";
