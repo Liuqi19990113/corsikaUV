@@ -43,7 +43,7 @@ int main(int argc,char *argv[]){
         std::cout<<"no QGP generated\n";
         std::cout<<"E and p_z within eta_cut :";
       }
-      cout<<"0 0 0 0";
+      cout<<eta_cut[0]<<' '<<eta_cut[1]<<" 0 0";
       return 0;
     }
     remove_eta_cut(secondaries,secondaries_cut,eta_cut);
