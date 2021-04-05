@@ -18,7 +18,8 @@ namespace Transform{
   double Ex_M_down[4]={0.,-10.,-10.,-10. };
   double Ex_M_up[4]={4.,10.,10.,10. };
   double Ex_Dx[4]={0.1,0.2,0.2,0.2 };
-  int Ex_eta_cut_mode=1;
+  int Ex_QGP_search_mode=1;
+  double Ex_QGP_volume=1.;
   double Ex_eta_cut[2]={-0,0};
   double Ex_Edec=0.18;
   double Ex_range=3;
@@ -28,7 +29,7 @@ namespace Transform{
   bool Ex_DEBUG=0;
   const double Pi=3.14159265358979323846264338328;
   const double HbarC=0.19733;
-  std::string Ex_input_file="urqmd_initial_14.txt";
+  std::string Ex_input_file="urqmd_result14";
   std::string Ex_output_path=".";
   std::string Ex_parameter_file="Transform_para.txt";
 
@@ -56,8 +57,9 @@ namespace Transform{
       else if(parameter_name=="y")input_line>>Ex_M_down[2]>>Ex_M_up[2]>>Ex_M_bin[2];
       else if(parameter_name=="eta")input_line>>Ex_M_down[3]>>Ex_M_up[3]>>Ex_M_bin[3];
       else if(parameter_name=="t")input_line>>Ex_M_down[0]>>Ex_M_up[0]>>Ex_M_bin[0];
-      else if(parameter_name=="eta_cut_mode")input_line>>Ex_eta_cut_mode;
+      else if(parameter_name=="QGP_search_mode")input_line>>Ex_QGP_search_mode;
       else if(parameter_name=="eta_cut")input_line>>Ex_eta_cut[0]>>Ex_eta_cut[1];
+      else if(parameter_name=="QGP_volume")input_line>>Ex_QGP_volume;
       else if(parameter_name=="Edec")input_line>>Ex_Edec;
       else if(parameter_name=="range")input_line>>Ex_range;
       else if(parameter_name=="input")input_line>>Ex_input_file;
