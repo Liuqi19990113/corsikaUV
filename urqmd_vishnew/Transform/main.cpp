@@ -82,7 +82,7 @@ int main(int argc,char *argv[]){
   //combine to oscar1997A format
   OSCAR_19(secondaries_cut);
   //combine to urqmd ftn14 format and freestreaming to t=0
-  urqmd_14(secondaries_cut);
+  // urqmd_14(secondaries_cut);
   WriteFlow2(energy_momentum);
   if(Ex_DEBUG){
     std::cout<<"secondaries in QGP "<<secondaries.size()<<std::endl;

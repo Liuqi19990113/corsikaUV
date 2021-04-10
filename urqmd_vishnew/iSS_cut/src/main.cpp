@@ -17,10 +17,10 @@ using namespace std;
 
 int main(int argc,char*argv[])
 {
-    string urqmd_path("./urqmd_initial_14.txt"); //path of urqmd_result19
-    string oscar_path("./OSCAR.DAT");   //path of OSCAR.DAT
+    string urqmd_path("urqmd_initial_14.txt"); //path of urqmd_result19
+    string oscar_path("OSCAR.DAT");   //path of OSCAR.DAT
     parameter para;
-    para.get_para("./cut_para.txt");
+    para.get_para("cut_para.txt");
 
     if (para.qgp_option == 0)
     {
@@ -56,23 +56,23 @@ int main(int argc,char*argv[])
     //     //system("mkdir ./results_of_cal/ep_spectrum");
     // }
         sample_by_sample_eta_cal(oscar_path,para.eta_left,para.eta_right,para.y_step,para.qgp_energy,para.qgp_pz,para.accept_error);
-        output_function("./results_of_cal/eta_cut_result.txt",oscar_path,"./results_of_cal/iSS_result.txt");
+        output_function("eta_cut_result.txt",oscar_path,"iSS_cut19.txt");
         //all_sample_eta_cal(oscar_path,para.eta_left,para.eta_right,para.y_step,para.qgp_energy,para.qgp_pz,para.accept_error);
-        }
-        if  (para.eta_or_y_option == 3)
-        {
-        if(access("./results_of_cal",0) != -1)
-        {
-            system("rm -rf  ./results_of_cal");
-            system("mkdir ./results_of_cal");
-            //system("mkdir ./results_of_cal/ep_spectrum");
-        }
-        else 
-        {
-            system("mkdir ./results_of_cal");
-            //system("mkdir ./results_of_cal/ep_spectrum");
-        }
+    }
+    if  (para.eta_or_y_option == 3)
+    {
+        // if(access("./results_of_cal",0) != -1)
+        // {
+        //     system("rm -rf  ./results_of_cal");
+        //     system("mkdir ./results_of_cal");
+        //     //system("mkdir ./results_of_cal/ep_spectrum");
+        // }
+        // else 
+        // {
+        //     system("mkdir ./results_of_cal");
+        //     //system("mkdir ./results_of_cal/ep_spectrum");
+        // }
         sample_eta_particle_by_particle(para.qgp_energy,para.qgp_pz,para.accept_error,oscar_path);
-        output_function("./results_of_cal/eta cut result of each sample.txt",oscar_path,"./results_of_cal/iSS result after cut.txt");
+        output_function("eta_cut_result.txt",oscar_path,"iSS_cut19.txt");
     }
 }    

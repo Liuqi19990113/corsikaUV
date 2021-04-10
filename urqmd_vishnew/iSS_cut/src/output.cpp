@@ -100,8 +100,4 @@ void output_function(string ycut_path, string oscar_path, string output_path)
         output_file.close();
 
     }
-
-    else
-    {
-    }
 }

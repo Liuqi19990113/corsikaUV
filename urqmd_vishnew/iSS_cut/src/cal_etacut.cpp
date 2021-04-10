@@ -93,7 +93,7 @@ int cal_etacut_with_output(double qgp_energy,double qgp_pz,double energy_list[],
 int sample_by_sample_eta_cal(string oscar_path,double eta_left,double eta_right,double y_step,double qgp_energy,double qgp_pz,double accept_error)
 {
     ofstream eta_cut_output_file;
-    eta_cut_output_file.open("./results_of_cal/eta cut result of each sample.txt",ios::out);
+    eta_cut_output_file.open("eta_cut_result.txt",ios::out);
     int lattice_number = (eta_right-eta_left)/y_step;
     ifstream oscar_file;
     oscar_file.open(oscar_path);
