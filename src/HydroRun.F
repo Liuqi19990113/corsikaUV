@@ -119,7 +119,7 @@
      & input_file_spec
      &  ="./urqmd_vishnew/urqmd/urqmd_spec_19.txt"
       double precision ::p_spec,E_spec,beta_spec(4),p_QGP,E_QGP,
-     &  beta_QGP(4)
+     &  beta_QGP(4),beta_NN(4),E_NN,p_NN
       double precision p(4),mass,x(4)
       integer pdg,counter
       integer QGP_status,spec_status,access
@@ -135,6 +135,9 @@
       E_QGP=0
       beta_spec=0
       beta_QGP=0
+      beta_NN=0
+      p_NN=0
+      E_NN=0
       ! 0 means exist, others means not exist
       ! whether or not have QGP
       QGP_status=access(input_file_QGP,"r")
@@ -151,8 +154,10 @@
           read(unit=spec_unit,fmt=*,end=100)counter,pdg,p(1),p(2)
      &     ,p(3),p(4),mass,x(1),x(2),x(3),x(4)
           ! if use QGP ,only spectator, if not use QGP , all particle
-          p_spec=p_spec+p(3)
-          E_spec=E_spec+p(4)
+          ! p_spec=p_spec+p(3)
+          ! E_spec=E_spec+p(4)
+          p_NN=p_NN+p(3)
+          E_NN=E_NN+p(4)
           ! eliminate pz=p(3)<0
           if((x(4).eq. 0 .and. p(3).gt.0).or.
      &     (.not.QGP_status.eq. 0)) then
@@ -175,22 +180,22 @@
           endif
         end do
 100     close(spec_unit)   
-        beta_spec(3)=p_spec/E_spec
-        beta_spec(4)=(1-beta_spec(3)**2)**(-0.5)
-        do i=1,nptl
-          do j=1,4
-            p(j)=pptl(j,i)
-          enddo
-          E_QGP=E_QGP+p(4)
-          p_QGP=p_QGP+p(3)
-          ! to cms
-          call LorentzTransform(beta_spec,p)
-          ! to lab
-          call LorentzTransform(beta,p)
-          do j=1,4
-            pptl(j,i)=p(j)
-          enddo
-        enddo
+        ! beta_spec(3)=p_spec/E_spec
+        ! beta_spec(4)=(1-beta_spec(3)**2)**(-0.5)
+        ! do i=1,nptl
+        !   do j=1,4
+        !     p(j)=pptl(j,i)
+        !   enddo
+        !   E_QGP=E_QGP+p(4)
+        !   p_QGP=p_QGP+p(3)
+        !   ! to cms
+        !   call LorentzTransform(beta_spec,p)
+        !   ! to lab
+        !   call LorentzTransform(beta,p)
+        !   do j=1,4
+        !     pptl(j,i)=p(j)
+        !   enddo
+        ! enddo
 
       endif
       !begin QGP
@@ -206,8 +211,10 @@
           ! read data line
           read(unit=QGP_unit,fmt=*,end=101)counter,pdg,p(1),p(2)
      &     ,p(3),p(4),mass,x(1),x(2),x(3),x(4)
-          p_QGP=p_QGP+p(3)
-          E_QGP=E_QGP+p(4)
+          ! p_QGP=p_QGP+p(3)
+          ! E_QGP=E_QGP+p(4)
+          p_NN=p_NN+p(3)
+          E_NN=E_NN+p(4)
           nptl=nptl+1
           do i=1,4
             pptl(i,nptl)=p(i)
@@ -216,23 +223,23 @@
           spec_judge(nptl)=0
         enddo
 101     close(QGP_unit)
-        beta_QGP(3)=p_QGP/E_QGP
-        beta_QGP(4)=(1-beta_QGP(3)**2)**(-0.5)
-        do i=nspec,nptl
+
+      endif
+
+        beta_NN(3)=p_NN/E_NN
+        beta_NN(4)=(1-beta_NN(3)**2)**(-0.5)
+        do i=1,nptl
           do j=1,4
             p(j)=pptl(j,i)
           enddo
           ! to cms
-          call LorentzTransform(beta_QGP,p)
+          call LorentzTransform(beta_NN,p)
           ! to lab
           call LorentzTransform(beta,p)
           do j=1,4
             pptl(j,i)=p(j)
           enddo
         enddo
-
-      endif
-
       RETURN
       end subroutine ReadHydro
 
