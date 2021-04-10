@@ -207,25 +207,25 @@ void ReadHydro(const double beta[4],int&nptl,int&nspec,int idptl[],double pptl[]
       p_spec+=p[2];
       E_spec+=p[3];
       //eliminate p_z<0 spectator
-      if((x[3]==0&&p[2]>0)||!QGP_judge){
-        idptl[nptl]=pdg;
-        spec_judge[nptl]=0;
-        for(int i=0;i<4;i++){
-          pptl[nptl][i]=p[i];
-        }
-        pptl[nptl][4]=mass;
-        if(x[3]==0){
-          //eliminate backwark spectator
-          if(p[2]>0){
-            nspec++;
-            spec_judge[nptl]=1;
-          }
-          else{
-            nptl--;
-          }
-        }
-        nptl++;
+      // if((x[3]==0&&p[2]>0)||!QGP_judge){
+      idptl[nptl]=pdg;
+      spec_judge[nptl]=0;
+      for(int i=0;i<4;i++){
+        pptl[nptl][i]=p[i];
       }
+      pptl[nptl][4]=mass;
+      if(x[3]==0){
+        //eliminate backwark spectator
+        if(p[2]>0){
+          nspec++;
+          spec_judge[nptl]=1;
+        }
+        else{
+          nptl--;
+        }
+      }
+      nptl++;
+      // }
     }
     input_spec.close();
     double beta_spec[4]={0,0,0,0};
