@@ -54,7 +54,7 @@ result_path=root_path+"/result"
 result_file=result_path+"/event"
 
 def write_urqmd_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,urqmd_seed):
-  print(" run.py : urqmd seed {}".format(urqmd_seed))
+  # print(" run.py : urqmd seed {}".format(urqmd_seed))
   output=open(urqmd_para_1,'w')
   A=1.6
   R_pro=0
@@ -125,7 +125,7 @@ DEBUG 0 // if 1, output some information for debug, else clean''')
 
 def run_transform(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2):
   os.chdir(transform_path)
-  write_transform_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
+  #write_transform_para(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
   if(not os.path.exists(transform_result_dir)):
     os.mkdir(transform_result_dir)
   [volume,E_core,p_core]=list(map(float,os.popen(transform_exec+' '+transform_para).read().split(' ')))

@@ -160,7 +160,7 @@
           E_NN=E_NN+p(4)
           ! eliminate pz=p(3)<0
           if((x(4).eq. 0 .and. p(3).gt.0).or.
-     &     (.not.QGP_status.eq. 0)) then
+     &     (.not.QGP_status.eq. 0).or. (.not. x(4).eq.0)) then
             nptl=nptl+1
             idptl(nptl)=pdg
             spec_judge(nptl)=0
@@ -202,6 +202,7 @@
       p_QGP=0
       E_QGP=0
       if(QGP_status.eq.0)then
+        write(*,*)"HydroRun: Generated QGP"
         open(unit=QGP_unit,file=input_file_QGP)
         ! remove header
         do i=1,4
@@ -224,8 +225,11 @@
         enddo
 101     close(QGP_unit)
 
-      endif
+      else
+        write(*,*)"HydroRun: Not Generated QGP"
 
+      endif
+        write(*,*)"HydroRun: E_NN,p_NN=",E_NN,p_NN
         beta_NN(3)=p_NN/E_NN
         beta_NN(4)=(1-beta_NN(3)**2)**(-0.5)
         do i=1,nptl

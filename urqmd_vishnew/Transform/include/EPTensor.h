@@ -25,6 +25,10 @@ namespace Transform{
     std::vector<std::vector<std::vector<int>>>QGP_flag_;
     ///flow four velocity
     std::vector<Array3> flow_;
+    ///get cosh_eta in grid
+    std::vector<double> cosh_eta_grid;
+    ///get sinh_eta in grid
+    std::vector<double> sinh_eta_grid;
   public:
     /**initialize the EPTensor*/
     EPTensor(double x_down=Ex_M_down[1],double x_up=Ex_M_up[1],double y_down=Ex_M_down[2],double y_up=Ex_M_up[2],double eta_down=Ex_M_down[3],double eta_up=Ex_M_up[3],double tau_0=Ex_Tau_0,double K=Ex_K,unsigned x_bin=Ex_M_bin[1],unsigned y_bin=Ex_M_bin[2],unsigned eta_bin=Ex_M_bin[3]);
@@ -40,7 +44,7 @@ namespace Transform{
     const std::vector<Array3>&GetFlow()const{return flow_;}
     /**add particle to Energy Tensor*/ 
     void AddParticle(const Particle&particle);
-    /**get momentum sum*/
+    /**get momentum sum, which means T_tau_t,T_tau_x ...*/
     double momentum(const int mu)const;
     /**calculate four flow*/
     void CalFlow();
@@ -71,6 +75,8 @@ namespace Transform{
   void write2(const EPTensor&tensor,const std::string&output_path=Ex_output_path);
   /**write flow in 2d to ed.dat u1.dat u2.dat with only eta=0*/
   void WriteFlow2(const EPTensor&tensor,const std::string&output_path=Ex_output_path);
+  /**write flow in 3d to ed_3.txt u1_3.txt u2_3.txt ueta_3.txt with only eta=0*/
+  void WriteFlow3(const EPTensor&tensor,const std::string&output_path=Ex_output_path);
 }
 
 
