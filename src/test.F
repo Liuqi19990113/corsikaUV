@@ -16,11 +16,11 @@
       
       DEBUG=.true.
 
-      itype=201.
-      tar=40
-      gamma=1e8
-      m_pro=0.938272013+0.939565346
-      m_tar=m_pro*20
+      itype=9.
+      tar=14
+      gamma=92556065.34734671
+      m_pro=0.139569
+      m_tar=(0.938272013+0.939565346)*7
       seedh=101
       ELABN=m_pro*gamma
       write(*,*) "seedh = "

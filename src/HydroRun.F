@@ -168,14 +168,9 @@
               pptl(i,nptl)=p(i)
             enddo
             pptl(5,nptl)=mass
-            if(x(4).eq.0)then
-              ! elminate backward spectator
-              if(p(3).gt.0)then
-                nspec=nspec+1
-                spec_judge(nptl)=1
-              else
-                nptl=nptl-1
-              endif
+            if(x(4).eq.0 .and. ABS(p(4)/mass/beta(4)-1)<0.1)then
+              nspec=nspec+1
+              spec_judge(nptl)=1
             endif
           endif
         end do

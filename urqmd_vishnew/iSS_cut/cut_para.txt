@@ -5,4 +5,4 @@ y_right = 20   //y_right of iss
 eta_left = -15
 eta_right = 15
 lattice_step = 0.0005   //lattice step
-accpet_error = 0.01   //accpet_error of energy and pz
+accpet_error = 0.005   //accpet_error of energy and pz
