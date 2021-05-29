@@ -22,6 +22,7 @@ transform_input=transform_path+"/urqmd_initial_14.txt"
 transform_result_dir=transform_path+"/Initial"
 transform_para=transform_path+"/Transform_para.txt"
 transform_cut=transform_result_dir+"/QGP_cut19.txt"
+critical_volume=10.
 # VISHNew variable
 vishnew_path=root_path+"/VISHNew"
 vishnew_exec=vishnew_path+"/VISHNew"
@@ -34,6 +35,7 @@ iss_input_dir=iss_path+"/results"
 iss_result=iss_path+"/OSCAR.DAT"
 iss_cut_exec=iss_path+"/iSS_cut"
 iss_cut_result=iss_path+"/iSS_cut19.txt"
+critical_depth=5
 #osc2u variable
 osc2u_path=root_path+"/osc2u"
 osc2u_exec=osc2u_path+"/osc2u"
@@ -111,16 +113,16 @@ x -13 13 65 // x_range: x_down x_up x_bin ,with bin is (2*val)+1
 y -13 13 65 // y_range: y_down y_up y_bin ,with bin is (2*val)+1
 eta -8 8 40 // eta_range: eta_down eta_up eta_bin ,with bin is (2*val)+1
 QGP_search_mode 2 // 0: calculate eta_cut from Edec, 1: use input eta_cut 2: use fireball volume on eta=0
-QGP_volume 0.001 //minimum volume for QGP generated
+QGP_volume {volume} //minimum volume for QGP generated
 eta_cut -0 0 // for eta_cut_mode=1,output particle over eta_cut to QGP_cut19.txt and QGP_cut14.txt
-Edec 2 // decoupling energy density GeV/fm^3, for eta_cut_mode=0
+Edec 1 // decoupling energy density GeV/fm^3, for eta_cut_mode=0
 range 3 //range of particle impact
 input urqmd_initial_14.txt //input file name
 output Initial //output file dir
 K 1 // normalization factor of EPTensor
 VISHNEW 1 // output vishnew Initial: ed.txt u1.txt u2.txt,ed in GeV/fm^3
 MUSIC 0 // output MUSIC Initial:haven't been finished
-DEBUG 0 // if 1, output some information for debug, else clean''')
+DEBUG 0 // if 1, output some information for debug, else clean'''.format(volume=critical_volume))
   output.close()
 
 def run_transform(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2):
@@ -146,6 +148,7 @@ def run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_par
   if(os.path.exists(urqmd_spec)):
     os.remove(urqmd_spec)
   os.chdir(urqmd_path)
+  # execute urqmd and get whether urqmd is interact
   urqmd_judge0=os.popen(urqmd_initial_exec).read()
   urqmd_judge=urqmd_judge0.replace('\n', '')
   urqmd_judge=urqmd_judge.strip(" ")
@@ -177,17 +180,21 @@ def run_vishnew():
     shutil.rmtree(iss_input_dir)
   shutil.move(vishnew_result_dir,iss_input_dir)
 
-def run_iSS(E_core,p_core):
+def run_iSS(E_core,p_core,repeated):
+  # don't repeat too much time
+  if repeated>critical_depth:
+    return repeated
   os.chdir(iss_path)
   os.popen(iss_exec).read()
   cut_judge=int(os.popen(iss_cut_exec+" {E} {p}".format(E=E_core,p=p_core)).read
   ())
   if(cut_judge==0):
-    run_iSS(E_core,p_core)
-    return
+    repeated2=run_iSS(E_core,p_core,repeated+1)
+    return repeated2
   if(os.path.exists(osc2u_QGP)):
     os.remove(osc2u_QGP)
   shutil.move(iss_cut_result,osc2u_QGP)
+  return repeated
 
 
 def run_osc2u():
@@ -227,10 +234,9 @@ print("HydroRun : python run.py {} {} {} {} {} {} {}".format(ene,nucleus_judge,p
 E_0=0
 if(E_core>E_0):
   run_vishnew()
-  run_iSS(E_core,p_core)
-  # shutil.move(iss_result,urqmd_QGP)
-  run_osc2u()
-  run_urqmd_frez()
-# if(QGP_judge==0):
-#   os.rename(urqmd_QGP,urqmd_spec)
-  # os.rename(urqmd_initial_result19,urqmd_spec)
+  repeated=0
+  repeated=run_iSS(E_core,p_core,repeated)
+  # record QGP data only when eta cut is repeated less than critical_depth
+  if repeated<=critical_depth:
+    run_osc2u()
+    run_urqmd_frez()
