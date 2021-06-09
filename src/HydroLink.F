@@ -36,6 +36,13 @@ C-----------------------------------------------------------------------
       double precision::p_sum(4)=0
       integer i,j
       
+c explanation of the variable
+c nptl: number of secondaries
+c nspec: number of spectator
+c spec_judge: judge if the particle is spectator
+c seedh: seed for urqmd_vishnew
+c idptl: particle type of secondaries
+c pptl: (px,py,pz,E,mass) of all secondaries
 
       nptl=0
       nspec=0
