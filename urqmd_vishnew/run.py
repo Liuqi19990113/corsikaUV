@@ -19,6 +19,7 @@ transform_path=root_path+"/transform"
 transform_exec=transform_path+"/transform"
 transform_para=transform_path+"/Transform_para.txt"
 transform_input=transform_path+"/urqmd_initial_14.txt"
+transform_spec=transform_path+"/urqmd_spec_19.txt"
 transform_result_dir=transform_path+"/Initial"
 transform_para=transform_path+"/Transform_para.txt"
 transform_cut=transform_result_dir+"/QGP_cut19.txt"
@@ -134,7 +135,7 @@ def run_transform(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
   if(E_core>0):
     if(os.path.exists(vishnew_input_dir)):
       shutil.rmtree(vishnew_input_dir)
-    shutil.move(transform_cut,osc2u_cut)
+    # shutil.move(transform_cut,osc2u_cut)
     shutil.move(transform_result_dir,vishnew_input_dir)
   return [volume,E_core,p_core]
 
@@ -166,6 +167,7 @@ def run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_par
     return run_urqmd_initial(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2,seedh+1)
   # use transform to judge if have QGP, use QGP_judge_mode 2
   shutil.move(urqmd_initial_result14,transform_input)
+  shutil.copy(urqmd_spec,transform_spec)
   [volume,E_core,p_core]=run_transform(ene,nucleus_judge,pro_para_1,pro_para_2,tar_para_1,tar_para_2)
   
   return [volume,E_core,p_core]
@@ -205,11 +207,11 @@ def run_osc2u():
     os.remove(urqmd_frez_QGP)
   shutil.move(osc2u_QGP_move,urqmd_frez_QGP)
 
-  os.popen(osc2u_exec+"<"+osc2u_cut).read()
-  os.rename(osc2u_result,osc2u_cut_move)
-  if(os.path.exists(urqmd_frez_cut)):
-    os.remove(urqmd_frez_cut)
-  shutil.move(osc2u_cut_move,urqmd_frez_cut)
+  # os.popen(osc2u_exec+"<"+osc2u_cut).read()
+  # os.rename(osc2u_result,osc2u_cut_move)
+  # if(os.path.exists(urqmd_frez_cut)):
+  #   os.remove(urqmd_frez_cut)
+  # shutil.move(osc2u_cut_move,urqmd_frez_cut)
 
 def run_urqmd_frez():
   os.chdir(urqmd_path)

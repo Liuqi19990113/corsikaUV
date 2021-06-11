@@ -158,9 +158,9 @@
           ! E_spec=E_spec+p(4)
           p_NN=p_NN+p(3)
           E_NN=E_NN+p(4)
-          ! eliminate pz=p(3)<0
-          if((x(4).eq. 0 .and. p(3).gt.0).or.
-     &     (.not.QGP_status.eq. 0).or. (.not. x(4).eq.0)) then
+          ! if exits QGP, only record spectator, or record all
+          if(((QGP_status.eq. 0).and.x(4).eq. 0 .and. p(3).gt.0)
+     &     .or. (.not. (QGP_status.eq. 0))) then
             nptl=nptl+1
             idptl(nptl)=pdg
             spec_judge(nptl)=0
@@ -194,8 +194,8 @@
 
       endif
       !begin QGP
-      p_QGP=0
-      E_QGP=0
+      ! p_QGP=0
+      ! E_QGP=0
       if(QGP_status.eq.0)then
         write(*,*)"HydroRun: Generated QGP"
         open(unit=QGP_unit,file=input_file_QGP)
@@ -207,10 +207,10 @@
           ! read data line
           read(unit=QGP_unit,fmt=*,end=101)counter,pdg,p(1),p(2)
      &     ,p(3),p(4),mass,x(1),x(2),x(3),x(4)
-          ! p_QGP=p_QGP+p(3)
-          ! E_QGP=E_QGP+p(4)
-          p_NN=p_NN+p(3)
-          E_NN=E_NN+p(4)
+          p_QGP=p_QGP+p(3)
+          E_QGP=E_QGP+p(4)
+          ! p_NN=p_NN+p(3)
+          ! E_NN=E_NN+p(4)
           nptl=nptl+1
           do i=1,4
             pptl(i,nptl)=p(i)
@@ -225,6 +225,7 @@
 
       endif
         write(*,*)"HydroRun: E_NN,p_NN=",E_NN,p_NN
+        write(*,*)"HydroRun: E_QGP_NN,p_QGP_NN=",E_QGP,p_QGP
         beta_NN(3)=p_NN/E_NN
         beta_NN(4)=(1-beta_NN(3)**2)**(-0.5)
         do i=1,nptl

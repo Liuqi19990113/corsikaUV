@@ -75,7 +75,12 @@ namespace Transform{
    * @para[in] mu: the momentum component, 0~3
   */
   double momentum_Milne_sum(const std::vector<Particle>&secondaries,int mu);
-  
+  /** get QGP energy and momentum from oscar19 file
+   * @para[in] E_QGP: store energy of QGP
+   * @para[in] p_QGP: store pz of QGP
+   * @note: use for Ex_QGP_search_mode ==3
+  */
+  void read_spec_energy_momentum_oscar(double&E_QGP,double&p_QGP,const std::string spec_file="urqmd_spec_19.txt");
 }
 
 #endif

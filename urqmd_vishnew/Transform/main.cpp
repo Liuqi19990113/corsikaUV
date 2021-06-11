@@ -31,7 +31,9 @@ int main(int argc,char *argv[]){
     double energy0=search_energy();
     std::cout<<"energy : "<<energy0<<"  energy on tau_0 : "<<momentum_sum(secondaries,0)<<" secondaries on tau_0 : "<<secondaries.size()<<std::endl;
   }
-  remove_spectator(secondaries,secondaries_cut);
+  if(Ex_QGP_search_mode!=3){
+    remove_spectator(secondaries,secondaries_cut);
+  }
   if(Ex_DEBUG){
     double energy0=0;
     double eta_min=20;
@@ -84,7 +86,7 @@ int main(int argc,char *argv[]){
     }
     remove_eta_cut(secondaries,secondaries_cut,eta_cut);
   }
-  else if(Ex_QGP_search_mode==2){
+  else if(Ex_QGP_search_mode==2||Ex_QGP_search_mode==3){
     if(Ex_DEBUG){
       std::cout<<"QGP judge with max volume judge\n";
     }
@@ -100,8 +102,10 @@ int main(int argc,char *argv[]){
       else std::cout<<volume<<" "<<0<<' '<<0<<std::endl;
       return 0;
     }
-    else{
-      remove_QGP_volume(secondaries,secondaries_cut,energy_momentum);
+    else {
+      if(Ex_QGP_search_mode==2){
+        remove_QGP_volume(secondaries,secondaries_cut,energy_momentum);
+      }
       if(Ex_DEBUG){
         std::cout<<"max QGP volume "<<volume<<" begin at ("<<id_x<<","<<id_y<<")"<<std::endl;
         std::cout<<"sum of QGP volume :"<<energy_momentum.QGP_volume_sum()<<std::endl;
@@ -117,6 +121,27 @@ int main(int argc,char *argv[]){
   //   std::cout<<secondaries[i].momentum().Minkow()[0]<<' '<<secondaries[i].momentum().Minkow()[3]<<std::endl;
   // }
   // return 0;
+  if(Ex_QGP_search_mode == 3){
+    if(Ex_DEBUG){
+      urqmd_14(secondaries_cut);
+      OSCAR_19(secondaries_cut);
+    }
+    if(Ex_Vishnew){
+      WriteFlow2(energy_momentum);
+    }
+    if(Ex_MUSIC){
+      WriteFlow3(energy_momentum);
+    }
+    double E_QGP=0,p_QGP=0;
+    read_spec_energy_momentum_oscar(E_QGP,p_QGP);
+    if(Ex_DEBUG){
+      std::cout<<"E and p_z out of QGP: "<<energy_momentum.momentum(0)-E_QGP<<' '<<energy_momentum.momentum(3)-p_QGP<<std::endl;
+      std::cout<<"E and p_z in EPTensor_QGP :"<<E_QGP<<' '<<p_QGP<<std::endl;
+      std::cout<<"E and p_z in QGP :";
+    }
+    std::cout<<E_QGP<<' '<<p_QGP<<std::endl;
+    return 0;
+  }
   EPTensor energy_momentum_QGP;
   for(int i=0;i<secondaries.size();i++){
     energy_momentum_QGP.AddParticle(secondaries[i]);

@@ -16,15 +16,16 @@
       
       DEBUG=.true.
 
-      itype=9.
+      itype=14.
       tar=14
-      gamma=92556065.34734671
-      m_pro=0.139569
+      gamma=10964052.519184392/0.938272013
+      ! m_pro=0.139569
+      m_pro=0.938272013
       m_tar=(0.938272013+0.939565346)*7
-      seedh=101
+      seedh=302840
       ELABN=m_pro*gamma
-      write(*,*) "seedh = "
-      read(*,*) seedh
+      write(*,*) "seedh = ",seedh
+      ! read(*,*) seedh
 
       CALL HydroRun(int(itype),int(tar),gamma,m_pro
      & ,nptl,nspec,idptl,pptl,spec_judge,seedh)

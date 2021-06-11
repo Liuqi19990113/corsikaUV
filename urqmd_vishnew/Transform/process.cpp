@@ -381,6 +381,36 @@ namespace Transform{
     return energy/Ex_Tau_0;
   }
 
+  void read_spec_energy_momentum_oscar(double&E_QGP,double&p_QGP,const std::string spec_file){
+    E_QGP=0;
+    p_QGP=0;
+    std::ifstream input(spec_file.c_str());
+    std::string data_line;
+    for(int i=0;i<3;i++){
+      getline(input,data_line);
+      data_line.clear();
+    }
+    double middle;
+    int secondaries_num;
+    input>>middle>>secondaries_num>>middle>>middle;
+    int id,pid;
+    double p[4],x[4],mass;
+    for(int i=0;i<secondaries_num;i++){
+      input>>id>>pid;
+      for(int j=0;j<4;j++){
+        input>>p[j];
+      }
+      input>>mass;
+      for(int j=0;j<4;j++){
+        input>>x[j];
+      }
+      if(x[3]!=0){
+        E_QGP+=p[3];
+        p_QGP+=p[2];
+      }
+    }
+  }
+
 
 
 }
